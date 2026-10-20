@@ -18,7 +18,7 @@ function scheda(r) {
     ? r.nervi.map((n) => `<a class="chip" href="anatomia.html#${n}"><span class="pallino" style="background:${coloreNervo(n)}"></span>${esc(nomeNervo(n))}</a>`).join("")
     : `<span class="piccolo">${esc(r.via || "")}</span>`;
   return `<article class="scheda riflesso" id="${r.id}" data-categoria="${r.categoria}">
-    <span class="etichetta${r.categoria === "patologico" ? " patologico" : ""}">${esc(CATEGORIE[r.categoria].nome.replace(/^Riflessi /, ""))} · ${esc(r.sede)}</span>
+    <span class="etichetta${r.categoria !== "osteotendineo" && r.categoria !== "superficiale" ? " patologico" : ""}">${esc(CATEGORIE[r.categoria].breve)} · ${esc(r.sede)}</span>
     <h3>${esc(r.nome)}</h3>
     <dl class="scheda-nervo">
       <dt>Livello</dt><dd>${esc(r.radici)}</dd>
@@ -34,7 +34,7 @@ function scheda(r) {
 }
 
 function disegna(categoria) {
-  const filtri = [["tutti", "Tutti"], ...Object.entries(CATEGORIE).map(([k, c]) => [k, c.nome.replace(/^Riflessi /, "").replace(/^\w/, (x) => x.toUpperCase())])];
+  const filtri = [["tutti", "Tutti"], ...Object.entries(CATEGORIE).map(([k, c]) => [k, c.breve])];
   $("#filtri").innerHTML = filtri.map(([k, n]) => `<a class="btn${k === categoria ? " attivo" : ""}" href="#${k}">${esc(n)}</a>`).join("");
   const gruppi = Object.entries(CATEGORIE).filter(([k]) => categoria === "tutti" || k === categoria);
   $("#elenco-riflessi").innerHTML = gruppi
@@ -45,7 +45,7 @@ function disegna(categoria) {
 
 $("#scala-ninds").innerHTML = SCALA_NINDS.map((s) => `<tr><td><strong>${s.grado}</strong></td><td>${esc(s.descrizione)}</td></tr>`).join("");
 $("#fonti-scala").innerHTML = ["hallett1993", "litvan1996", "campbell8"].map(fonte).join("; ");
-$("#fonti-interpretazione").innerHTML = ["campbell8", "aids2023", "preston4", "eanpnsGbs2023"].map(fonte).join("; ");
+$("#fonti-interpretazione").innerHTML = ["campbell8", "aids2023", "preston4", "eanpnsGbs2023", "schott2003", "jacobs1980"].map(fonte).join("; ");
 
 // #id-riflesso apre la categoria e scorre alla scheda; #categoria filtra
 function daFrammento() {

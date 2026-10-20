@@ -191,3 +191,4 @@ a.chip { text-decoration: none; color: inherit; }
 @media (max-width: 800px) { .griglia-larga { grid-template-columns: 1fr; } }
 a.voce-mov { text-decoration: none; }
 .riflesso { scroll-margin-top: 72px; }
+#filtri a.btn { flex: 0 1 auto; padding: 6px 14px; }

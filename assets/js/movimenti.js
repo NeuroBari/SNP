@@ -207,7 +207,7 @@ function riflessiMovimento(mv, lesi) {
   if (!lista.length) return "";
   return `<h4 style="margin:14px 0 4px">Riflessi correlati</h4><ul class="piccolo" style="padding-left:18px;margin:0">${lista
     .map((r) => {
-      const livello = r.categoria === "patologico" ? "patologico" : r.radici;
+      const livello = r.categoria === "patologico" ? "patologico" : r.categoria === "liberazione" ? "segno di liberazione frontale" : r.radici;
       const leso = lesi.length && riflessoColpito(r, lesi) ? ' — <strong style="color:var(--perso)">ridotto/assente con questa lesione</strong>' : "";
       return `<li><a href="riflessi.html#${r.id}">${esc(r.nome)}</a> (${esc(livello)})${leso}</li>`;
     })

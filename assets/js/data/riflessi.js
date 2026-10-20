@@ -11,9 +11,10 @@
 // evocabile se i muscoli della risposta sono paralizzati (es. Babinski e lesione del peroneo).
 
 export const CATEGORIE = {
-  osteotendineo: { nome: "Riflessi osteotendinei", descrizione: "Riflessi miotatici (di stiramento) monosinaptici: lo stiramento rapido del muscolo attiva i fusi neuromuscolari, le fibre afferenti Ia e, a livello del midollo, i motoneuroni α dello stesso muscolo." },
-  superficiale: { nome: "Riflessi superficiali (cutanei)", descrizione: "Riflessi polisinaptici evocati da uno stimolo cutaneo. A differenza degli osteotendinei, si riducono o scompaiono nelle lesioni del primo motoneurone." },
-  patologico: { nome: "Riflessi patologici e segni di liberazione", descrizione: "Risposte assenti nell'adulto sano (o presenti in modo simmetrico e lieve), che indicano in genere una lesione delle vie corticospinali." },
+  osteotendineo: { nome: "Riflessi osteotendinei", breve: "Osteotendinei", descrizione: "Riflessi miotatici (di stiramento) monosinaptici: lo stiramento rapido del muscolo attiva i fusi neuromuscolari, le fibre afferenti Ia e, a livello del midollo, i motoneuroni α dello stesso muscolo." },
+  superficiale: { nome: "Riflessi superficiali (cutanei)", breve: "Superficiali", descrizione: "Riflessi polisinaptici evocati da uno stimolo cutaneo. A differenza degli osteotendinei, si riducono o scompaiono nelle lesioni del primo motoneurone." },
+  patologico: { nome: "Riflessi patologici (vie corticospinali)", breve: "Patologici", descrizione: "Risposte assenti nell'adulto sano (o presenti in modo simmetrico e lieve), che indicano in genere una lesione delle vie corticospinali." },
+  liberazione: { nome: "Segni di liberazione frontale (riflessi primitivi)", breve: "Liberazione frontale", descrizione: "Riflessi fisiologici nel neonato, inibiti con la maturazione dei lobi frontali, che possono ricomparire nelle lesioni frontali o nelle encefalopatie diffuse. A parte la prensione, il valore localizzatore è limitato: palmomentale e muso sono presenti in una quota di adulti sani, soprattutto anziani. Contano intensità, persistenza (mancato esaurimento), asimmetria e associazione con altri segni." },
 };
 
 export const RIFLESSI = [
@@ -184,6 +185,70 @@ export const RIFLESSI = [
     risposta: "Contrazione degli adduttori della coscia controlaterale.",
     significato: "Diffusione del riflesso: indica iperreflessia da lesione del primo motoneurone.",
     fonti: ["campbell8"],
+  },
+  // --- Segni di liberazione frontale
+  {
+    id: "prensione", nome: "Riflesso di prensione (grasping)", categoria: "liberazione", sede: "Arto superiore",
+    radici: "—", nervi: [], muscoli: [], movimento: "fi-flex-pip",
+    via: "Afferenze tattili e propriocettive del palmo; risposta dei flessori delle dita",
+    tecnica: "Mentre si distrae il paziente, si striscia il palmo con le dita dell'esaminatore o con un oggetto, dal lato ulnare verso lo spazio tra pollice e indice.",
+    risposta: "Flessione e chiusura involontaria delle dita sullo stimolo; la presa può rinforzarsi se si tenta di sfilare la mano e il paziente fatica a lasciarla. Analogo plantare: flessione delle dita del piede.",
+    significato: "Il più utile tra i segni di liberazione: raro nell'adulto sano, indica una lesione del lobo frontale mediale (area motoria supplementare, giro del cingolo) controlaterale, o una malattia frontale diffusa. Fisiologico nel lattante, scompare nei primi mesi di vita.",
+    fonti: ["schott2003", "campbell8"],
+  },
+  {
+    id: "palmomentale", nome: "Riflesso palmomentale", categoria: "liberazione", sede: "Capo",
+    radici: "—", nervi: [], muscoli: [], movimento: null,
+    via: "Afferenze cutanee dell'eminenza tenar; efferenza dal n. faciale (muscolo mentale)",
+    tecnica: "Si striscia con una punta smussa la cute dell'eminenza tenar, dal polso verso la base del pollice.",
+    risposta: "Breve contrazione del muscolo mentale omolaterale, con sollevamento e increspatura della cute del mento.",
+    significato: "Presente in una parte consistente degli adulti sani, con frequenza crescente con l'età: ha scarso valore isolato. È più significativo se marcato, persistente alla ripetizione, unilaterale o associato ad altri segni di liberazione.",
+    fonti: ["jacobs1980", "schott2003", "campbell8"],
+  },
+  {
+    id: "muso", nome: "Riflesso del muso (snout)", categoria: "liberazione", sede: "Capo",
+    radici: "—", nervi: [], muscoli: [], movimento: null,
+    via: "N. trigemino (afferenza) e n. faciale (orbicolare della bocca)",
+    tecnica: "Percussione leggera sul labbro superiore o sul filtro, oppure pressione sulle labbra chiuse.",
+    risposta: "Protrusione e increspatura delle labbra ('a muso').",
+    significato: "Indica una perdita dell'inibizione corticobulbare (lesioni frontali bilaterali, encefalopatie diffuse, paralisi pseudobulbare). Può essere presente in anziani sani.",
+    fonti: ["jacobs1980", "schott2003", "campbell8"],
+  },
+  {
+    id: "suzione", nome: "Riflesso di suzione", categoria: "liberazione", sede: "Capo",
+    radici: "—", nervi: [], muscoli: [], movimento: null,
+    via: "N. trigemino (afferenza); nn. faciale, trigemino e ipoglosso (risposta)",
+    tecnica: "Si sfiorano le labbra o si introduce delicatamente un abbassalingua tra le labbra.",
+    risposta: "Movimenti di suzione di labbra, lingua e mandibola.",
+    significato: "Fisiologico nel neonato; nell'adulto indica malattia frontale bilaterale o encefalopatia diffusa avanzata (es. demenza in fase avanzata).",
+    fonti: ["schott2003", "campbell8"],
+  },
+  {
+    id: "ricerca", nome: "Riflesso di ricerca (rooting)", categoria: "liberazione", sede: "Capo",
+    radici: "—", nervi: [], muscoli: [], movimento: null,
+    via: "N. trigemino (afferenza); n. faciale e muscoli del collo (risposta)",
+    tecnica: "Si striscia la cute della guancia o dell'angolo della bocca verso l'esterno.",
+    risposta: "Deviazione della bocca e rotazione del capo verso lo stimolo.",
+    significato: "Fisiologico nel neonato; nell'adulto ha lo stesso significato del riflesso di suzione.",
+    fonti: ["schott2003", "campbell8"],
+  },
+  {
+    id: "glabellare", nome: "Riflesso glabellare (segno di Myerson)", categoria: "liberazione", sede: "Capo",
+    radici: "—", nervi: [], muscoli: [], movimento: null,
+    via: "N. trigemino (branca oftalmica, afferenza); n. faciale (orbicolare dell'occhio)",
+    tecnica: "Percussioni ripetute sulla glabella a circa un colpo al secondo, dall'alto e fuori dal campo visivo del paziente.",
+    risposta: "Ammiccamento a ogni percussione. Normalmente la risposta si esaurisce dopo pochi colpi; è patologica se persiste.",
+    significato: "Il mancato esaurimento si osserva nella malattia di Parkinson e nelle encefalopatie frontali o diffuse.",
+    fonti: ["schott2003", "campbell8"],
+  },
+  {
+    id: "corneomandibolare", nome: "Riflesso corneomandibolare", categoria: "liberazione", sede: "Capo",
+    radici: "—", nervi: [], muscoli: [], movimento: null,
+    via: "N. trigemino (afferenza corneale e risposta motoria dello pterigoideo laterale); n. faciale (ammiccamento)",
+    tecnica: "Stimolazione della cornea come per il riflesso corneale, osservando la mandibola.",
+    risposta: "Ammiccamento accompagnato da una breve deviazione della mandibola verso il lato opposto allo stimolo.",
+    significato: "Indica una lesione corticobulbare bilaterale (es. paralisi pseudobulbare, malattia del motoneurone); più frequente nel parkinsonismo che nei controlli. Raro nei sani e, quando presente, associato ad altri riflessi primitivi.",
+    fonti: ["jacobs1980", "gossman1980", "campbell8"],
   },
 ];
 

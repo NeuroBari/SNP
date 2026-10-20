@@ -53,4 +53,22 @@ export const FONTI = {
     nota: "Linea guida europea sulla sindrome di Guillain-Barré.",
     url: "https://doi.org/10.1111/ene.16073",
   },
+  schott2003: {
+    breve: "Schott & Rossor (2003)",
+    completa: "Schott JM, Rossor MN. The grasp and other primitive reflexes. J Neurol Neurosurg Psychiatry. 2003;74(5):558-560. doi:10.1136/jnnp.74.5.558",
+    nota: "Revisione su evocazione e significato clinico dei riflessi primitivi.",
+    url: "https://doi.org/10.1136/jnnp.74.5.558",
+  },
+  jacobs1980: {
+    breve: "Jacobs & Gossman (1980)",
+    completa: "Jacobs L, Gossman MD. Three primitive reflexes in normal adults. Neurology. 1980;30(2):184-188. doi:10.1212/wnl.30.2.184",
+    nota: "Palmomentale, muso e corneomandibolare in 105 adulti sani: almeno uno presente nel 50,5%, con frequenza crescente con l'età.",
+    url: "https://doi.org/10.1212/wnl.30.2.184",
+  },
+  gossman1980: {
+    breve: "Gossman & Jacobs (1980)",
+    completa: "Gossman MD, Jacobs L. Three primitive reflexes in parkinsonism patients. Neurology. 1980;30(2):189-192. doi:10.1212/wnl.30.2.189",
+    nota: "Corneomandibolare circa 2,5 volte più frequente nel parkinsonismo rispetto ai controlli di pari età.",
+    url: "https://doi.org/10.1212/wnl.30.2.189",
+  },
 };
