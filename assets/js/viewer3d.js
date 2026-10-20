@@ -1,7 +1,7 @@
-// Visualizzatore 3D dell'arto superiore destro.
+// Visualizzatore 3D dell'arto superiore o inferiore destro.
 //
-// Il modello è SCHEMATICO e procedurale: segmenti (braccio, avambraccio, mano, dita)
-// collegati da articolazioni con nomi fissi. I movimenti in `data/arto-superiore.js`
+// Il modello è SCHEMATICO e procedurale: segmenti (es. braccio, avambraccio, mano, dita)
+// collegati da articolazioni con nomi fissi. I movimenti in `data/arto-*.js`
 // agiscono solo sui nomi delle articolazioni, quindi lo stesso motore potrà guidare
 // un modello realistico (glTF con armatura) le cui ossa usino gli stessi nomi.
 // Vedi docs/MODELLI-3D.md.
@@ -12,13 +12,15 @@ import { OrbitControls } from "three/addons/OrbitControls.js";
 const DEG = Math.PI / 180;
 const L_BRACCIO = 3.0;
 const L_AVAMBRACCIO = 2.6;
+const L_COSCIA = 4.2;
+const L_GAMBA = 3.9;
 
 const COLORE_MUSCOLO = 0xb35a50;
 const COLORE_PELLE = 0xe8c4a8;
 const COLORE_OSSO = 0xf2ede0;
 
 export class Visualizzatore {
-  constructor(contenitore, { onMuscoloClick, onMuscoloHover } = {}) {
+  constructor(contenitore, { regione = "superiore", onMuscoloClick, onMuscoloHover } = {}) {
     this.contenitore = contenitore;
     this.onMuscoloClick = onMuscoloClick;
     this.onMuscoloHover = onMuscoloHover;
@@ -31,7 +33,9 @@ export class Visualizzatore {
     this.fase = 0;
 
     this._initScena();
-    this._costruisciModello();
+    if (regione === "inferiore") this._costruisciArtoInferiore();
+    else this._costruisciArtoSuperiore();
+    this.vista("generale");
     this._initInterazione();
     this._loop = this._loop.bind(this);
     this._orologio = new THREE.Clock();
@@ -51,7 +55,6 @@ export class Visualizzatore {
 
     this.controlli = new OrbitControls(this.camera, this.renderer.domElement);
     this.controlli.enableDamping = true;
-    this.vista("generale");
 
     this.scena.add(new THREE.HemisphereLight(0xffffff, 0x8a7f73, 1.1));
     const luce = new THREE.DirectionalLight(0xffffff, 1.6);
@@ -95,7 +98,17 @@ export class Visualizzatore {
     return m;
   }
 
-  _costruisciModello() {
+  _costruisciArtoSuperiore() {
+    this.lunghezze = { braccio: L_BRACCIO, avambraccio: L_AVAMBRACCIO };
+    this.viste = {
+      generale: [[-8, 2, 16], [1.0, -2.8, 0]],
+      anteriore: [[1.0, -2.8, 19], [1.0, -2.8, 0]],
+      laterale: [[-18, -2, 1], [0, -2.8, 0]],
+      posteriore: [[1.0, -2.0, -19], [1.0, -2.8, 0]],
+      scapola: [[-7, 1, -14], [1.0, -1.0, 0]],
+      avambraccio: [[-7, 1.5, 9], [0, -3, 1.6]],
+      mano: [[-3, -5.2, 6.5], [0, -6.4, 0.3]],
+    };
     const corpo = new THREE.Group();
     this.scena.add(corpo);
     this.segmenti = { tronco: corpo };
@@ -202,9 +215,114 @@ export class Visualizzatore {
     ifP.add(this._capsula(0.085, 0.26, matDito));
   }
 
+  _costruisciArtoInferiore() {
+    this.lunghezze = { coscia: L_COSCIA, gamba: L_GAMBA };
+    this.viste = {
+      generale: [[-11, 1, 20], [1.0, -3.8, 0]],
+      anteriore: [[1.0, -3.5, 24], [1.0, -3.8, 0]],
+      laterale: [[-23, -2, 2], [0, -3.8, 0]],
+      posteriore: [[1.0, -2.5, -24], [1.0, -3.8, 0]],
+      piede: [[-4.5, -6.2, 6.5], [0, -8.5, 0.8]],
+    };
+    const corpo = new THREE.Group();
+    this.scena.add(corpo);
+    this.segmenti = { bacino: corpo };
+    const pelle = this._materialePelle();
+
+    // Bacino, tronco inferiore e arto controlaterale (contesto, fissi)
+    const bacino = new THREE.Mesh(new THREE.BoxGeometry(4.4, 1.6, 1.8), pelle);
+    bacino.position.set(1.8, 0.45, 0);
+    corpo.add(bacino);
+    const tronco = new THREE.Mesh(new THREE.BoxGeometry(3.6, 3.0, 1.6), pelle);
+    tronco.position.set(1.8, 2.75, 0);
+    corpo.add(tronco);
+    const ombelico = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), pelle);
+    ombelico.position.set(1.8, 2.0, 0.82);
+    corpo.add(ombelico); // indica la faccia anteriore
+    const osso = new THREE.MeshStandardMaterial({ color: COLORE_OSSO, roughness: 0.6 });
+    const pelvi = new THREE.Mesh(new THREE.TorusGeometry(1.35, 0.12, 8, 32, Math.PI), osso);
+    pelvi.rotation.z = Math.PI;
+    pelvi.position.set(1.8, 0.75, 0);
+    corpo.add(pelvi);
+    const controlaterale = this._capsula(0.55, L_COSCIA + L_GAMBA, pelle);
+    controlaterale.position.x = 3.6;
+    corpo.add(controlaterale);
+    const piedeSx = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.55, 2.2), pelle);
+    piedeSx.position.set(3.6, -L_COSCIA - L_GAMBA - 0.33, 0.75);
+    corpo.add(piedeSx);
+
+    // Anca e coscia
+    const anca = this._registra("anca", new THREE.Group());
+    corpo.add(anca);
+    anca.add(new THREE.Mesh(new THREE.SphereGeometry(0.55, 16, 12), pelle));
+    anca.add(this._capsula(0.58, L_COSCIA, pelle));
+    anca.add(this._osso(0.12, L_COSCIA - 0.1, 0, 0)); // femore
+    this.segmenti.coscia = anca;
+
+    // Ginocchio e gamba
+    const ginocchio = new THREE.Group();
+    ginocchio.position.y = -L_COSCIA;
+    this._registra("ginocchio", ginocchio);
+    anca.add(ginocchio);
+    ginocchio.add(new THREE.Mesh(new THREE.SphereGeometry(0.45, 16, 12), pelle));
+    const rotula = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 8), osso);
+    rotula.position.set(0, 0.15, 0.42);
+    ginocchio.add(rotula);
+    ginocchio.add(this._capsula(0.45, L_GAMBA, pelle));
+    ginocchio.add(this._osso(0.1, L_GAMBA - 0.1, 0.1, 0.12)); // tibia (anteromediale)
+    ginocchio.add(this._osso(0.05, L_GAMBA - 0.2, -0.28, -0.05)); // fibula (laterale)
+    this.segmenti.gamba = ginocchio;
+
+    // Caviglia e piede (il piede si estende lungo z+)
+    const caviglia = new THREE.Group();
+    caviglia.position.y = -L_GAMBA;
+    this._registra("caviglia", caviglia);
+    ginocchio.add(caviglia);
+    const piede = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.55, 2.2), pelle);
+    piede.position.set(0, -0.33, 0.75);
+    caviglia.add(piede);
+    [0.3, 0.12, -0.05, -0.2, -0.34].forEach((x) => {
+      const mt = this._osso(0.04, 1.1, x, 0);
+      mt.rotation.x = -Math.PI / 2;
+      mt.position.set(x, -0.3, 0.7);
+      caviglia.add(mt);
+    });
+    this.segmenti.piede = caviglia;
+
+    // Dita: gruppi ruotati di -90° su x, così le falangi (lungo -y locale) puntano in avanti
+    const matDito = new THREE.MeshStandardMaterial({ color: COLORE_PELLE, roughness: 0.7, transparent: true, opacity: 0.85 });
+    const dito = (nomeMtf, nomeIf, x, raggio, l1, l2) => {
+      const mtf = new THREE.Group();
+      mtf.position.set(x, -0.42, 1.85);
+      mtf.rotation.x = -Math.PI / 2;
+      if (nomeMtf) this._registra(nomeMtf, mtf);
+      caviglia.add(mtf);
+      mtf.add(this._capsula(raggio, l1, matDito));
+      const ip = new THREE.Group();
+      ip.position.y = -l1;
+      if (nomeIf) this._registra(nomeIf, ip);
+      mtf.add(ip);
+      ip.add(this._capsula(raggio * 0.9, l2, matDito));
+      return [mtf, ip];
+    };
+    dito("alluce_mtf", "alluce_if", 0.3, 0.13, 0.36, 0.3);
+    // Le dita II–V si muovono insieme: sono figlie di un'unica coppia di articolazioni
+    const [mtfDita, ifDita] = dito("dita_mtf", "dita_if", 0.08, 0.075, 0.28, 0.2);
+    [-0.1, -0.24, -0.37].forEach((dx, i) => {
+      const l1 = 0.26 - i * 0.03;
+      const f1 = this._capsula(0.07, l1, matDito);
+      f1.position.x = dx - 0.08;
+      mtfDita.add(f1);
+      const f2 = this._capsula(0.065, 0.18, matDito);
+      f2.position.x = dx - 0.08;
+      f2.position.y += 0.28 - l1;
+      ifDita.add(f2);
+    });
+  }
+
   // Crea i ventri muscolari a partire dalla lista MUSCOLI.
   aggiungiMuscoli(listaMuscoli) {
-    const lunghezze = { braccio: L_BRACCIO, avambraccio: L_AVAMBRACCIO };
+    const lunghezze = this.lunghezze;
     for (const m of listaMuscoli) {
       const mesh = [];
       for (const f of m.forma || []) {
@@ -316,17 +434,9 @@ export class Visualizzatore {
   }
 
   vista(nome) {
-    const viste = {
-      generale: [[-8, 2, 16], [1.0, -2.8, 0]],
-      anteriore: [[1.0, -2.8, 19], [1.0, -2.8, 0]],
-      laterale: [[-18, -2, 1], [0, -2.8, 0]],
-      posteriore: [[1.0, -2.0, -19], [1.0, -2.8, 0]],
-      scapola: [[-7, 1, -14], [1.0, -1.0, 0]],
-      avambraccio: [[-7, 1.5, 9], [0, -3, 1.6]],
-      mano: [[-3, -5.2, 6.5], [0, -6.4, 0.3]],
-    };
-    const [pos, target] = viste[nome] || viste.generale;
+    const [pos, target] = this.viste[nome] || this.viste.generale;
     this.camera.position.set(...pos);
     this.controlli.target.set(...target);
   }
+
 }

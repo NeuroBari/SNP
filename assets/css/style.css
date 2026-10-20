@@ -129,12 +129,12 @@ input[type="search"], select {
   font: inherit; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--bordo);
   background: var(--bg-2); color: var(--testo); width: 100%;
 }
-button.btn {
+button.btn, a.btn {
   font: inherit; font-size: 0.9rem; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--bordo);
   background: var(--bg-2); color: var(--testo); cursor: pointer;
 }
-button.btn:hover { border-color: var(--accento); }
-button.btn.attivo { background: var(--accento); color: #fff; border-color: var(--accento); }
+button.btn:hover, a.btn:hover { border-color: var(--accento); }
+button.btn.attivo, a.btn.attivo { background: var(--accento); color: #fff; border-color: var(--accento); }
 
 /* Pagina 3D */
 .layout-3d { display: grid; grid-template-columns: 330px 1fr 340px; gap: 16px; height: calc(100vh - 56px - 48px); min-height: 560px; }
@@ -149,7 +149,7 @@ button.btn.attivo { background: var(--accento); color: #fff; border-color: var(-
 .legenda-3d { position: absolute; top: 10px; left: 10px; font-size: 0.78rem; background: var(--bg-2); border: 1px solid var(--bordo);
   border-radius: 8px; padding: 6px 10px; max-width: 60%; opacity: 0.95; }
 .schede-tab { display: flex; gap: 4px; margin-bottom: 12px; }
-.schede-tab button { flex: 1; }
+.schede-tab button, .schede-tab a { flex: 1; text-align: center; text-decoration: none; }
 .gruppo-mov h4 { margin: 12px 0 4px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--testo-2); }
 .voce-mov {
   display: flex; justify-content: space-between; align-items: center; gap: 6px; width: 100%; text-align: left; border: 0; background: none;
@@ -180,3 +180,4 @@ button.btn.attivo { background: var(--accento); color: #fff; border-color: var(-
   dl.scheda-nervo { grid-template-columns: 1fr; }
   dl.scheda-nervo dt { margin-top: 8px; }
 }
+td .chip { white-space: normal; }

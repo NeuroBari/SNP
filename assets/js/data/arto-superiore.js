@@ -483,29 +483,15 @@ export const MOVIMENTI = [
     a: { pollice_mcf: { r: [0, 0, 15] }, pollice_if: { r: [0, 0, 60] } } },
 ];
 
-// Indici di comodo
-export const muscoloPerId = Object.fromEntries(MUSCOLI.map((m) => [m.id, m]));
-export const nervoPerId = Object.fromEntries(NERVI.map((n) => [n.id, n]));
-export const muscoliDelNervo = (idNervo) => MUSCOLI.filter((m) => m.nervi.includes(idNervo));
-export const movimentiDelMuscolo = (idMuscolo) => MOVIMENTI.filter((mv) => mv.muscoli.some((x) => x.id === idMuscolo));
-
-// Effetto di una lesione su un movimento:
-//   "perso"        -> tutti i muscoli principali colpiti
-//   "ridotto"      -> almeno un muscolo principale colpito
-//   "lieve"        -> solo muscoli accessori colpiti
-//   "conservato"   -> nessun muscolo colpito
-export function effettoLesione(movimento, muscoliColpiti) {
-  const colpiti = new Set(muscoliColpiti);
-  const principali = movimento.muscoli.filter((m) => m.ruolo === "principale");
-  const nP = principali.filter((m) => colpiti.has(m.id)).length;
-  if (principali.length && nP === principali.length) return "perso";
-  if (nP > 0) return "ridotto";
-  if (movimento.muscoli.some((m) => colpiti.has(m.id))) return "lieve";
-  return "conservato";
-}
+// Inquadratura della camera suggerita per ciascun distretto
+export const VISTE_DISTRETTO = { Scapola: "scapola", Spalla: "generale", Gomito: "laterale", Avambraccio: "avambraccio", Polso: "mano", Dita: "mano", Pollice: "mano" };
 
 // Schema del plesso brachiale (coordinate per il diagramma SVG)
 export const PLESSO = {
+  nome: "Plesso brachiale",
+  altezza: 405,
+  colonne: [[50, "Radici"], [190, "Tronchi"], [300, "Divisioni"], [430, "Corde"], [630, "Nervi terminali"]],
+  descrizione: "Schema semplificato: radici → tronchi → divisioni (A anteriore, P posteriore) → corde → nervi terminali; in corsivo i principali rami collaterali.",
   nodi: [
     { id: "C5", tipo: "radice", x: 50, y: 70 }, { id: "C6", tipo: "radice", x: 50, y: 130 }, { id: "C7", tipo: "radice", x: 50, y: 190 },
     { id: "C8", tipo: "radice", x: 50, y: 250 }, { id: "T1", tipo: "radice", x: 50, y: 310 },

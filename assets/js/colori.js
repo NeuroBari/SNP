@@ -12,6 +12,16 @@ export const COLORI_NERVI = {
   radiale: "#2f80c9",
   mediano: "#8e44ad",
   ulnare: "#e0457b",
+  // arto inferiore
+  "cutaneo-femorale-laterale": "#9c8a5a",
+  femorale: "#3cae5c",
+  otturatore: "#c9a227",
+  "gluteo-superiore": "#e67e22",
+  "gluteo-inferiore": "#a0522d",
+  sciatico: "#708090",
+  peroneo: "#2f80c9",
+  tibiale: "#8e44ad",
+  surale: "#e0457b",
 };
 
 export const coloreNervo = (id) => COLORI_NERVI[id] || "#888888";

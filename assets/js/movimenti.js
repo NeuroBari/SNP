@@ -1,5 +1,5 @@
 import { Visualizzatore } from "./viewer3d.js";
-import { MOVIMENTI, MUSCOLI, NERVI, muscoloPerId, nervoPerId, muscoliDelNervo, movimentiDelMuscolo, effettoLesione } from "./data/arto-superiore.js";
+import { REGIONI, regioneDelNervo, effettoLesione } from "./data/regioni.js";
 import { coloreNervo } from "./colori.js";
 
 const $ = (sel) => document.querySelector(sel);
@@ -7,11 +7,26 @@ const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&l
 const ETICHETTE = { perso: "perso", ridotto: "ridotto", lieve: "lieve deficit", conservato: "conservato" };
 const AMPIEZZA = { perso: 0.08, ridotto: 0.55, lieve: 0.85, conservato: 1 };
 const COLORE_LESO = "#c0392b";
-const VISTA_DISTRETTO = { Scapola: "scapola", Spalla: "generale", Gomito: "laterale", Avambraccio: "avambraccio", Polso: "mano", Dita: "mano", Pollice: "mano" };
+
+// Regione scelta dal link: movimenti.html#regione=inferiore, #nervo=peroneo oppure #mov=ank-df
+const parametri = new URLSearchParams(location.hash.slice(1));
+const regione =
+  REGIONI[parametri.get("regione")] ||
+  regioneDelNervo(parametri.get("nervo")) ||
+  Object.values(REGIONI).find((r) => r.MOVIMENTI.some((m) => m.id === parametri.get("mov"))) ||
+  REGIONI.superiore;
+const { MOVIMENTI, MUSCOLI, NERVI, muscoloPerId, nervoPerId, muscoliDelNervo, movimentiDelMuscolo, VISTE_DISTRETTO } = regione;
+document.title = `Movimenti 3D · ${regione.nome} · SNP`;
+document.getElementById("legenda").textContent = `${regione.modello} · modello schematico. Trascina per ruotare, rotella per zoom, clic su un muscolo per i dettagli.`;
+document.getElementById("scelta-regione").innerHTML = Object.values(REGIONI)
+  .map((r) => `<a class="btn${r === regione ? " attivo" : ""}" href="#regione=${r.id}">${r.nome}</a>`)
+  .join("");
+window.addEventListener("hashchange", () => location.reload());
 
 const stato = { movimento: null, nervo: null, lesione: null, muscolo: null };
 
 const viewer = new Visualizzatore($("#scena"), {
+  regione: regione.id,
   onMuscoloClick: (id) => {
     stato.muscolo = id;
     aggiornaInfo();
@@ -174,7 +189,7 @@ function scegliMovimento(id) {
   const mv = MOVIMENTI.find((m) => m.id === id) || null;
   stato.movimento = stato.movimento?.id === id ? null : mv;
   viewer.impostaMovimento(stato.movimento);
-  const vista = VISTA_DISTRETTO[stato.movimento?.distretto];
+  const vista = stato.movimento && (stato.movimento.vista || VISTE_DISTRETTO[stato.movimento.distretto]);
   if (vista && vista !== stato.vista) viewer.vista((stato.vista = vista));
   aggiornaTutto();
 }
@@ -221,11 +236,10 @@ $("#pausa").addEventListener("click", (ev) => {
 $("#velocita").addEventListener("input", (ev) => (viewer.velocita = Number(ev.target.value)));
 $("#tutti-muscoli").addEventListener("change", aggiornaColori);
 
-// Link diretti: movimenti.html#nervo=radiale oppure #mov=el-flex
-const parametri = new URLSearchParams(location.hash.slice(1));
 if (nervoPerId[parametri.get("nervo")]) {
   stato.nervo = parametri.get("nervo");
   mostraTab("lesioni");
 }
 aggiornaTutto();
 if (parametri.get("mov")) scegliMovimento(parametri.get("mov"));
+document.querySelectorAll("[data-regione]").forEach((el) => (el.hidden = el.dataset.regione !== regione.id));

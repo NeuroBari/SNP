@@ -9,23 +9,24 @@
 <body data-pagina="anatomia.html">
   <div id="testata"></div>
   <main>
-    <h1>Anatomia · Arto superiore</h1>
-    <p class="sottotitolo">Plesso brachiale e nervi dell'arto superiore. Seleziona un nervo dallo schema o dall'elenco.</p>
+    <h1 id="titolo-regione">Anatomia</h1>
+    <div class="schede-tab" id="scelta-regione" style="max-width:420px" aria-label="Regione"></div>
+    <p class="sottotitolo">Seleziona un nervo dallo schema del plesso o dall'elenco.</p>
 
     <div class="layout-anatomia">
       <aside class="elenco-nervi scheda" id="elenco-nervi" aria-label="Elenco dei nervi"></aside>
       <div>
         <section class="scheda plesso">
-          <h3 style="margin-top:0">Plesso brachiale</h3>
+          <h3 style="margin-top:0" id="titolo-plesso"></h3>
           <div id="plesso"></div>
-          <p class="piccolo">Schema semplificato: radici → tronchi → divisioni (A anteriore, P posteriore) → corde → nervi terminali; in corsivo i principali rami collaterali. Clicca un nervo per la scheda.</p>
+          <p class="piccolo" id="descrizione-plesso"></p>
         </section>
 
         <section class="scheda" id="scheda-nervo" style="margin-top:16px"></section>
 
         <section class="scheda" style="margin-top:16px">
           <h3 style="margin-top:0">Tutti i muscoli</h3>
-          <input type="search" id="cerca-muscolo" placeholder="Cerca muscolo, nervo o radice (es. C8, ulnare, pollice)…" aria-label="Cerca muscolo">
+          <input type="search" id="cerca-muscolo" placeholder="Cerca muscolo, nervo o radice (es. C8, ulnare, L5, peroneo)…" aria-label="Cerca muscolo">
           <div class="tabella-scorri" style="margin-top:10px">
             <table>
               <thead><tr><th>Muscolo</th><th>Nervo</th><th>Radici</th><th>Azione</th><th>Test clinico</th></tr></thead>

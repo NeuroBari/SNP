@@ -13,6 +13,10 @@ I movimenti (`assets/js/data/arto-superiore.js`, array `MOVIMENTI`) agiscono sol
 | `polso` | flesso-estensione (x), deviazione radiale/ulnare (z) |
 | `dito2..dito5_mcf/_ifp/_ifd` | flessione (x), abduzione (z, solo MCF) |
 | `pollice_cmc/_mcf/_if` | flesso-estensione nel piano del palmo (z), abduzione palmare (x) |
+| `anca` | flesso-estensione (x), intra/extrarotazione (y), abduzione/adduzione (z) |
+| `ginocchio` | flesso-estensione (x) |
+| `caviglia` | flessione plantare/dorsiflessione (x), inversione/eversione (z) |
+| `alluce_mtf/_if`, `dita_mtf/_if` | flesso-estensione (x), abduzione dell'alluce (z) |
 
 Un modello realistico con un'**armatura** (scheletro di animazione) le cui ossa abbiano gli stessi nomi
 può quindi essere guidato dagli stessi dati, senza riscrivere i movimenti.
@@ -28,7 +32,7 @@ può quindi essere guidato dagli stessi dati, senza riscrivere i movimenti.
 > CC BY-SA impone attribuzione e che le opere derivate (i modelli modificati) siano rilasciate con la stessa licenza.
 
 ## Pipeline
-1. **Blender** (gratuito): aprire il file Z-Anatomy, isolare arto superiore e cingolo (ossa, muscoli, nervi del plesso brachiale).
+1. **Blender** (gratuito): aprire il file Z-Anatomy, isolare l'arto con il suo cingolo (ossa, muscoli, nervi del plesso brachiale o lombosacrale).
 2. Ridurre i poligoni (modificatore *Decimate*) per restare sotto ~10–20 MB complessivi.
 3. Creare un'armatura con le ossa nominate come in tabella e collegarvi le mesh (*Parent → With Automatic Weights*, poi correggere i pesi).
 4. Nominare ogni mesh muscolare con l'`id` usato nei dati (es. `bicipite`, `fds`, `apb`) così da colorarla per nervo/lesione.

@@ -1,15 +1,15 @@
-import { NERVI, PLESSO, muscoliDelNervo, nervoPerId } from "./data/arto-superiore.js";
-import { MUSCOLI } from "./data/arto-superiore.js";
+import { REGIONI, regioneDelNervo } from "./data/regioni.js";
 import { FONTI } from "./data/fonti.js";
 import { coloreNervo } from "./colori.js";
 
 const $ = (sel) => document.querySelector(sel);
+let regione = REGIONI.superiore;
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 
 // --- Elenco dei nervi
 function disegnaElenco(attivo) {
   const gruppi = {};
-  NERVI.forEach((n) => (gruppi[n.gruppo] ||= []).push(n));
+  regione.NERVI.forEach((n) => (gruppi[n.gruppo] ||= []).push(n));
   $("#elenco-nervi").innerHTML = Object.entries(gruppi)
     .map(
       ([g, lista]) =>
@@ -23,6 +23,7 @@ function disegnaElenco(attivo) {
 
 // --- Schema del plesso (SVG)
 function disegnaPlesso() {
+  const { PLESSO, nervoPerId } = regione;
   const nodi = Object.fromEntries(PLESSO.nodi.map((n) => [n.id, n]));
   const archi = PLESSO.archi
     .map(([a, b]) => {
@@ -48,14 +49,17 @@ function disegnaPlesso() {
         <circle cx="${n.x}" cy="${n.y}" r="${r}" fill="${fill}"/>${etichetta(n)}</g>`;
     })
     .join("");
-  const colonne = [[50, "Radici"], [190, "Tronchi"], [300, "Divisioni"], [430, "Corde"], [630, "Nervi terminali"]]
-    .map(([x, t]) => `<text class="titolo-colonna" x="${x}" y="395" text-anchor="middle">${t}</text>`)
+  const colonne = PLESSO.colonne
+    .map(([x, t]) => `<text class="titolo-colonna" x="${x}" y="${PLESSO.altezza - 10}" text-anchor="middle">${t}</text>`)
     .join("");
-  $("#plesso").innerHTML = `<svg viewBox="0 0 760 405" role="img" aria-label="Schema del plesso brachiale">${archi}${nodiSvg}${colonne}</svg>`;
+  $("#titolo-plesso").textContent = PLESSO.nome;
+  $("#descrizione-plesso").textContent = `${PLESSO.descrizione} Clicca un nervo per la scheda.`;
+  $("#plesso").innerHTML = `<svg viewBox="0 0 760 ${PLESSO.altezza}" role="img" aria-label="Schema del ${esc(PLESSO.nome.toLowerCase())}">${archi}${nodiSvg}${colonne}</svg>`;
 }
 
 // --- Scheda del nervo
 function disegnaScheda(id) {
+  const { nervoPerId, muscoliDelNervo, MUSCOLI } = regione;
   const n = nervoPerId[id];
   if (!n) return;
   const muscoli = muscoliDelNervo(id);
@@ -93,7 +97,8 @@ function disegnaScheda(id) {
 }
 
 // --- Tabella di tutti i muscoli
-function disegnaTabella(filtro = "") {
+function disegnaTabella(filtro = $("#cerca-muscolo").value) {
+  const { MUSCOLI, nervoPerId } = regione;
   const f = filtro.trim().toLowerCase();
   const righe = MUSCOLI.filter((m) => {
     if (!f) return true;
@@ -109,8 +114,20 @@ function disegnaTabella(filtro = "") {
     .join("");
 }
 
+// Il frammento dell'URL può contenere l'id di un nervo (#peroneo) o di una regione (#inferiore)
 function seleziona(id) {
-  if (!nervoPerId[id]) id = "radiale";
+  const nuova = regioneDelNervo(id) || REGIONI[id] || regione;
+  if (!nuova.nervoPerId[id]) id = nuova.nervoIniziale;
+  if (nuova !== regione || !$("#plesso").innerHTML) {
+    regione = nuova;
+    document.title = `Anatomia · ${regione.nome} · SNP`;
+    $("#titolo-regione").textContent = `Anatomia · ${regione.nome}`;
+    $("#scelta-regione").innerHTML = Object.values(REGIONI)
+      .map((r) => `<a class="btn${r === regione ? " attivo" : ""}" href="#${r.id}">${r.nome}</a>`)
+      .join("");
+    disegnaPlesso();
+    disegnaTabella();
+  }
   disegnaElenco(id);
   disegnaScheda(id);
   if (location.hash !== `#${id}`) history.replaceState(null, "", `#${id}`);
@@ -127,6 +144,5 @@ document.addEventListener("keydown", (ev) => {
 });
 $("#cerca-muscolo").addEventListener("input", (ev) => disegnaTabella(ev.target.value));
 
-disegnaPlesso();
-disegnaTabella();
+window.addEventListener("hashchange", () => seleziona(location.hash.slice(1)));
 seleziona(location.hash.slice(1));

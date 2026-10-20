@@ -17,6 +17,7 @@
   <main style="max-width:none;padding-bottom:16px">
     <div class="layout-3d">
       <aside class="pannello" aria-label="Selezione">
+        <div class="schede-tab" id="scelta-regione" aria-label="Regione"></div>
         <div class="schede-tab" role="tablist">
           <button class="btn attivo" data-tab="movimenti" role="tab">Movimenti</button>
           <button class="btn" data-tab="lesioni" role="tab">Nervi e lesioni</button>
@@ -31,14 +32,15 @@
       </aside>
 
       <section class="scena-3d" id="scena" aria-label="Modello 3D dell'arto superiore destro">
-        <div class="legenda-3d" id="legenda">Arto superiore destro · modello schematico. Trascina per ruotare, rotella per zoom, clic su un muscolo per i dettagli.</div>
+        <div class="legenda-3d" id="legenda"></div>
         <div class="tooltip-3d" id="tooltip"></div>
         <div class="comandi-3d">
           <button class="btn" data-vista="generale">Generale</button>
           <button class="btn" data-vista="anteriore">Anteriore</button>
           <button class="btn" data-vista="laterale">Laterale</button>
           <button class="btn" data-vista="posteriore">Posteriore</button>
-          <button class="btn" data-vista="mano">Mano</button>
+          <button class="btn" data-vista="mano" data-regione="superiore">Mano</button>
+          <button class="btn" data-vista="piede" data-regione="inferiore">Piede</button>
           <button class="btn" id="pausa">Pausa</button>
           <label>Velocità <input type="range" id="velocita" min="0.2" max="2" step="0.1" value="1"></label>
           <label><input type="checkbox" id="tutti-muscoli" checked> tutti i muscoli</label>
