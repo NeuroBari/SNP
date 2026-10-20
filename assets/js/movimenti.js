@@ -17,7 +17,22 @@ const regione =
   REGIONI.superiore;
 const { MOVIMENTI, MUSCOLI, NERVI, muscoloPerId, nervoPerId, muscoliDelNervo, movimentiDelMuscolo, VISTE_DISTRETTO } = regione;
 document.title = `Movimenti 3D · ${regione.nome} · SNP`;
-document.getElementById("legenda").textContent = `${regione.modello} · modello schematico. Trascina per ruotare, rotella per zoom, clic su un muscolo per i dettagli.`;
+// Modello: realistico (Z-Anatomy) dove disponibile, altrimenti schematico; #modello=schematico per forzarlo
+const modello = regione.modelloRealistico && parametri.get("modello") !== "schematico" ? "realistico" : "schematico";
+const ISTRUZIONI = "Trascina per ruotare, rotella per zoom, clic su un muscolo per i dettagli.";
+const CREDITI = `Modello anatomico: <a href="https://www.z-anatomy.com/" target="_blank" rel="noopener">Z-Anatomy</a>
+  (<a href="https://creativecommons.org/licenses/by-sa/4.0/deed.it" target="_blank" rel="noopener">CC BY-SA 4.0</a>),
+  derivato da BodyParts3D © DBCLS (CC BY-SA 2.1 JP); modificato. <a href="fonti.html#modelli-3d">Dettagli</a>`;
+document.getElementById("legenda").innerHTML =
+  modello === "realistico"
+    ? `${regione.modello} · <span id="stato-caricamento">caricamento del modello…</span><br><span class="piccolo">${CREDITI}</span>`
+    : `${regione.modello} · modello schematico. ${ISTRUZIONI}`;
+document.getElementById("scelta-modello").innerHTML = regione.modelloRealistico
+  ? ["realistico", "schematico"]
+      .map((m) => `<a class="btn${m === modello ? " attivo" : ""}" href="#regione=${regione.id}&modello=${m}">${m === "realistico" ? "Realistico" : "Schematico"}</a>`)
+      .join("")
+  : "";
+document.getElementById("controllo-nervi").hidden = modello !== "realistico";
 document.getElementById("scelta-regione").innerHTML = Object.values(REGIONI)
   .map((r) => `<a class="btn${r === regione ? " attivo" : ""}" href="#regione=${r.id}">${r.nome}</a>`)
   .join("");
@@ -25,18 +40,38 @@ window.addEventListener("hashchange", () => location.reload());
 
 const stato = { movimento: null, nervo: null, lesione: null, muscolo: null };
 
+// Descrizione breve di una struttura del modello (muscolo o nervo)
+function descrivi(info) {
+  if (info.tipo === "nervo") return nervoPerId[info.id] ? `${nervoPerId[info.id].nome} — ${info.nome}` : `Plesso brachiale — ${info.nome}`;
+  const m = muscoloPerId[info.id];
+  return m ? `${m.nome} — ${m.nervi.map((n) => nervoPerId[n].nome).join(", ")}` : `${info.nome} (senza scheda)`;
+}
+
 const viewer = new Visualizzatore($("#scena"), {
   regione: regione.id,
-  onMuscoloClick: (id) => {
-    stato.muscolo = id;
-    aggiornaInfo();
+  modello,
+  urlModello: regione.modelloRealistico,
+  onCaricamento: (f) => {
+    const el = $("#stato-caricamento");
+    if (el && f != null) el.textContent = `caricamento del modello… ${Math.round(f * 100)}%`;
   },
-  onMuscoloHover: (id, ev) => {
+  onMuscoloClick: (info) => {
+    if (info.tipo === "nervo" && nervoPerId[info.id]) {
+      stato.nervo = info.id;
+      stato.lesione = null;
+      mostraTab("lesioni");
+      return aggiornaTutto();
+    }
+    if (!muscoloPerId[info.id]) return;
+    stato.muscolo = info.id;
+    aggiornaInfo();
+    aggiornaColori();
+  },
+  onMuscoloHover: (info, ev) => {
     const t = $("#tooltip");
-    if (!id) return (t.style.display = "none");
-    const m = muscoloPerId[id];
+    if (!info) return (t.style.display = "none");
     const r = $("#scena").getBoundingClientRect();
-    t.textContent = `${m.nome} — ${m.nervi.map((n) => nervoPerId[n].nome).join(", ")}`;
+    t.textContent = descrivi(info);
     t.style.display = "block";
     t.style.left = `${ev.clientX - r.left + 12}px`;
     t.style.top = `${ev.clientY - r.top + 12}px`;
@@ -44,6 +79,15 @@ const viewer = new Visualizzatore($("#scena"), {
 });
 viewer.aggiungiMuscoli(MUSCOLI);
 window.viewer = viewer; // utile per il debug dalla console
+viewer.pronto
+  .then(() => {
+    const el = $("#stato-caricamento");
+    if (el) el.textContent = ISTRUZIONI;
+  })
+  .catch((err) => {
+    const el = $("#stato-caricamento");
+    if (el) el.textContent = `errore nel caricamento del modello (${err.message}). Prova il modello schematico.`;
+  });
 
 const muscoliLesi = () => {
   if (!stato.nervo || !stato.lesione) return [];
@@ -74,6 +118,13 @@ function aggiornaColori() {
     stati[stato.muscolo] = { colore: stati[stato.muscolo]?.colore || coloreNervo(m.nervi[0]), opacita: 1, emissivo: 0x444444 };
   }
   viewer.coloraMuscoli(stati, { colore: 0xb35a50, opacita: base.opacita });
+
+  // Nervi (solo modello realistico): evidenzia il nervo scelto e quelli dei muscoli del movimento
+  const statiNervi = {};
+  if (stato.movimento) for (const { id } of stato.movimento.muscoli) for (const n of muscoloPerId[id].nervi) statiNervi[n] = { colore: coloreNervo(n) };
+  if (stato.nervo) statiNervi[stato.nervo] = { colore: stato.lesione ? COLORE_LESO : coloreNervo(stato.nervo) };
+  const opacitaAltri = $("#mostra-nervi").checked ? (Object.keys(statiNervi).length ? 0.3 : 1) : 0;
+  viewer.coloraNervi(statiNervi, { opacita: opacitaAltri });
   viewer.ampiezza = stato.movimento && lesi.size ? AMPIEZZA[effettoLesione(stato.movimento, [...lesi])] : 1;
 }
 
@@ -235,6 +286,7 @@ $("#pausa").addEventListener("click", (ev) => {
 });
 $("#velocita").addEventListener("input", (ev) => (viewer.velocita = Number(ev.target.value)));
 $("#tutti-muscoli").addEventListener("change", aggiornaColori);
+$("#mostra-nervi").addEventListener("change", aggiornaColori);
 
 if (nervoPerId[parametri.get("nervo")]) {
   stato.nervo = parametri.get("nervo");

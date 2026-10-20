@@ -1,8 +1,15 @@
 # Modelli 3D: dallo schema al modello realistico
 
 ## Stato attuale
-`movimenti.html` usa un modello **schematico** generato via codice (`assets/js/viewer3d.js`, three.js).
-I movimenti (`assets/js/data/arto-superiore.js`, array `MOVIMENTI`) agiscono solo su **articolazioni con nome**:
+- **Arto superiore: modello realistico** derivato da Z-Anatomy (CC BY-SA 4.0), in
+  `assets/models/arto-superiore.glb` (~2 MB). Ossa rigide; muscoli e nervi deformati da uno
+  scheletro di animazione costruito al caricamento sui centri articolari calcolati dallo script
+  `tools/modelli/estrai-arto-superiore.mjs`. Licenza e attribuzioni: `assets/models/LICENZA.md`.
+- **Arto inferiore** (e alternativa per il superiore): modello **schematico** generato via codice.
+
+I movimenti (`assets/js/data/arto-*.js`, array `MOVIMENTI`) agiscono solo su **articolazioni con nome**,
+quindi guidano entrambi i modelli. Un movimento può definire `realistico: { da, a }` quando la posa
+schematica non si adatta alla geometria reale (es. opposizione del pollice).
 
 | Articolazione | Movimenti |
 |---|---|
@@ -31,7 +38,7 @@ può quindi essere guidato dagli stessi dati, senza riscrivere i movimenti.
 
 > CC BY-SA impone attribuzione e che le opere derivate (i modelli modificati) siano rilasciate con la stessa licenza.
 
-## Pipeline
+## Pipeline (alternativa con Blender, per modifiche manuali)
 1. **Blender** (gratuito): aprire il file Z-Anatomy, isolare l'arto con il suo cingolo (ossa, muscoli, nervi del plesso brachiale o lombosacrale).
 2. Ridurre i poligoni (modificatore *Decimate*) per restare sotto ~10–20 MB complessivi.
 3. Creare un'armatura con le ossa nominate come in tabella e collegarvi le mesh (*Parent → With Automatic Weights*, poi correggere i pesi).

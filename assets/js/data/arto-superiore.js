@@ -255,19 +255,19 @@ export const NERVI = [
       {
         id: "gomito",
         nome: "Gomito (solco retroepicondilare / tunnel cubitale)",
-        muscoli: ["fcu", "fdp-ulnare", "adm", "odm", "interossei-dorsali", "interossei-palmari", "lombricali-ulnare", "adduttore-pollice"],
+        muscoli: ["fcu", "fdp-ulnare", "adm", "odm", "fdm", "interossei-dorsali", "interossei-palmari", "lombricali-ulnare", "adduttore-pollice", "fpb-profondo"],
         note: "Seconda neuropatia da intrappolamento per frequenza. Il FCU è spesso risparmiato (fascicoli più profondi/rami prossimali). Deficit sensitivo incluso il dorso ulnare della mano.",
       },
       {
         id: "guyon",
         nome: "Canale di Guyon (polso)",
-        muscoli: ["adm", "odm", "interossei-dorsali", "interossei-palmari", "lombricali-ulnare", "adduttore-pollice"],
+        muscoli: ["adm", "odm", "fdm", "interossei-dorsali", "interossei-palmari", "lombricali-ulnare", "adduttore-pollice", "fpb-profondo"],
         note: "Risparmiato il ramo cutaneo dorsale (dorso della mano normale). A seconda della sede può essere solo motoria (ramo profondo) e risparmiare l'ipotenar.",
       },
       {
         id: "ramo-profondo",
         nome: "Ramo profondo (distale all'ipotenar)",
-        muscoli: ["interossei-dorsali", "interossei-palmari", "lombricali-ulnare", "adduttore-pollice"],
+        muscoli: ["interossei-dorsali", "interossei-palmari", "lombricali-ulnare", "adduttore-pollice", "fpb-profondo"],
         note: "Puramente motoria; ADM risparmiato (es. ciclisti, uso di attrezzi).",
       },
     ],
@@ -372,10 +372,14 @@ export const MUSCOLI = [
     forma: [{ seg: "mano", p1: [-0.18, -0.12, 0.16], p2: [-0.32, -0.5, 0.16], r: 0.065 }] },
   { id: "lombricali-mediano", nome: "Lombricali I–II", nervi: ["mediano"], radici: "C8, T1", azione: "Flessione delle MCF con estensione delle IF (indice, medio).", test: "Non testabili isolatamente in modo affidabile.",
     forma: [{ seg: "mano", p1: [-0.3, -0.45, 0.14], p2: [-0.3, -0.86, 0.14], r: 0.035 }, { seg: "mano", p1: [-0.1, -0.45, 0.14], p2: [-0.1, -0.86, 0.14], r: 0.035 }] },
+  { id: "fpb-profondo", nome: "Flessore breve del pollice (capo profondo)", nervi: ["ulnare"], radici: "C8, T1", azione: "Flessione della MCF del pollice.", test: "Non testabile isolatamente in modo affidabile.", nota: "Innervazione variabile: spesso ulnare (ramo profondo), talora doppia.",
+    forma: [] },
   { id: "adduttore-pollice", nome: "Adduttore del pollice", nervi: ["ulnare"], radici: "C8, T1", azione: "Adduzione del pollice.", test: "Trattenere un foglio tra pollice e indice (segno di Froment).",
     forma: [{ seg: "mano", p1: [0.0, -0.45, 0.1], p2: [-0.32, -0.55, 0.1], r: 0.07 }] },
   { id: "adm", nome: "Abduttore del mignolo", nervi: ["ulnare"], radici: "C8, T1", azione: "Abduzione del mignolo.", test: "Abduzione del mignolo contro resistenza; palpare il ventre.",
     forma: [{ seg: "mano", p1: [0.39, -0.08, 0.06], p2: [0.41, -0.82, 0.06], r: 0.08 }] },
+  { id: "fdm", nome: "Flessore breve del mignolo", nervi: ["ulnare"], radici: "C8, T1", azione: "Flessione della MCF del mignolo.", test: "Non testabile isolatamente in modo affidabile.",
+    forma: [] },
   { id: "odm", nome: "Opponente del mignolo", nervi: ["ulnare"], radici: "C8, T1", azione: "Opposizione del V metacarpo.", test: "Non testabile isolatamente in modo affidabile.",
     forma: [{ seg: "mano", p1: [0.3, -0.12, 0.13], p2: [0.33, -0.72, 0.14], r: 0.06 }] },
   { id: "interossei-dorsali", nome: "Interossei dorsali", nervi: ["ulnare"], radici: "C8, T1", azione: "Abduzione delle dita (rispetto all'asse del medio).", test: "I interosseo dorsale: abduzione dell'indice contro resistenza; palpare nel primo spazio.",
@@ -387,6 +391,7 @@ export const MUSCOLI = [
 ];
 
 // Pose: rotazioni in gradi [x,y,z] e traslazioni [x,y,z] rispetto alla posizione anatomica.
+// Un movimento può avere `realistico: { da, a }` con pose specifiche per il modello Z-Anatomy.
 // Articolazioni: cingolo, spalla, gomito, avambraccio (prono-supinazione), polso,
 // dito2..dito5 _mcf/_ifp/_ifd, pollice_cmc/_mcf/_if.
 const DITA = [2, 3, 4, 5];
@@ -470,7 +475,9 @@ export const MOVIMENTI = [
     a: { pollice_cmc: { r: [-55, 0, 0] } } },
   { id: "th-opp", nome: "Opposizione del pollice", distretto: "Pollice",
     muscoli: [{ id: "opponente-pollice", ruolo: "principale" }, { id: "apb", ruolo: "accessorio" }, { id: "fpb", ruolo: "accessorio" }],
-    a: { pollice_cmc: { r: [-50, -40, 40] }, pollice_mcf: { r: [0, 0, 20] }, pollice_if: { r: [0, 0, 15] } } },
+    a: { pollice_cmc: { r: [-50, -40, 40] }, pollice_mcf: { r: [0, 0, 20] }, pollice_if: { r: [0, 0, 15] } },
+    // posa calcolata sulla geometria del modello realistico: polpastrello del pollice alla base del mignolo
+    realistico: { a: { pollice_cmc: { r: [-10, 25, 35] }, pollice_mcf: { r: [0, 0, 20] }, pollice_if: { r: [0, 0, 30] } } } },
   { id: "th-ext", nome: "Estensione del pollice", distretto: "Pollice",
     muscoli: [{ id: "epl", ruolo: "principale" }, { id: "epb", ruolo: "principale" }, { id: "apl", ruolo: "accessorio" }],
     da: { pollice_cmc: { r: [0, 0, 25] }, pollice_mcf: { r: [0, 0, 20] }, pollice_if: { r: [0, 0, 45] } },
@@ -484,7 +491,7 @@ export const MOVIMENTI = [
 ];
 
 // Inquadratura della camera suggerita per ciascun distretto
-export const VISTE_DISTRETTO = { Scapola: "scapola", Spalla: "generale", Gomito: "laterale", Avambraccio: "avambraccio", Polso: "mano", Dita: "mano", Pollice: "mano" };
+export const VISTE_DISTRETTO = { Scapola: "scapola", Spalla: "spalla", Gomito: "laterale", Avambraccio: "avambraccio", Polso: "mano", Dita: "mano", Pollice: "mano" };
 
 // Schema del plesso brachiale (coordinate per il diagramma SVG)
 export const PLESSO = {

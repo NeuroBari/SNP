@@ -2,10 +2,10 @@
 import * as superiore from "./arto-superiore.js";
 import * as inferiore from "./arto-inferiore.js";
 
-function crea(id, nome, modello, nervoIniziale, dati) {
+function crea(id, nome, modello, nervoIniziale, dati, modelloRealistico = null) {
   const { NERVI, MUSCOLI, MOVIMENTI, PLESSO, VISTE_DISTRETTO } = dati;
   return {
-    id, nome, modello, nervoIniziale, NERVI, MUSCOLI, MOVIMENTI, PLESSO, VISTE_DISTRETTO,
+    id, nome, modello, nervoIniziale, modelloRealistico, NERVI, MUSCOLI, MOVIMENTI, PLESSO, VISTE_DISTRETTO,
     muscoloPerId: Object.fromEntries(MUSCOLI.map((m) => [m.id, m])),
     nervoPerId: Object.fromEntries(NERVI.map((n) => [n.id, n])),
     muscoliDelNervo: (idNervo) => MUSCOLI.filter((m) => m.nervi.includes(idNervo)),
@@ -14,7 +14,8 @@ function crea(id, nome, modello, nervoIniziale, dati) {
 }
 
 export const REGIONI = {
-  superiore: crea("superiore", "Arto superiore", "Arto superiore destro", "radiale", superiore),
+  // Il modello realistico deriva da Z-Anatomy (CC BY-SA 4.0): vedi assets/models/LICENZA.md
+  superiore: crea("superiore", "Arto superiore", "Arto superiore destro", "radiale", superiore, "assets/models/arto-superiore.glb"),
   inferiore: crea("inferiore", "Arto inferiore", "Arto inferiore destro", "peroneo", inferiore),
 };
 

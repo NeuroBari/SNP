@@ -1,13 +1,19 @@
 // Visualizzatore 3D dell'arto superiore o inferiore destro.
 //
-// Il modello è SCHEMATICO e procedurale: segmenti (es. braccio, avambraccio, mano, dita)
-// collegati da articolazioni con nomi fissi. I movimenti in `data/arto-*.js`
-// agiscono solo sui nomi delle articolazioni, quindi lo stesso motore potrà guidare
-// un modello realistico (glTF con armatura) le cui ossa usino gli stessi nomi.
-// Vedi docs/MODELLI-3D.md.
+// Due modelli possibili:
+//  - SCHEMATICO, procedurale: segmenti (es. braccio, avambraccio, mano, dita)
+//    collegati da articolazioni con nomi fissi;
+//  - REALISTICO (solo arto superiore): ossa, muscoli e nervi di Z-Anatomy
+//    (CC BY-SA 4.0) caricati da assets/models/arto-superiore.glb. Le ossa seguono
+//    rigidamente le articolazioni, muscoli e nervi si deformano con pesi calcolati
+//    dalla distanza dai segmenti ossei.
+// I movimenti in `data/arto-*.js` agiscono solo sui nomi delle articolazioni,
+// quindi guidano entrambi i modelli. Vedi docs/MODELLI-3D.md.
 
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/OrbitControls.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 
 const DEG = Math.PI / 180;
 const L_BRACCIO = 3.0;
@@ -18,14 +24,40 @@ const L_GAMBA = 3.9;
 const COLORE_MUSCOLO = 0xb35a50;
 const COLORE_PELLE = 0xe8c4a8;
 const COLORE_OSSO = 0xf2ede0;
+const COLORE_NERVO = 0xe9c46a;
+
+const VISTE_SUPERIORE = {
+  generale: [[-8, 2, 16], [1.0, -2.8, 0]],
+  anteriore: [[1.0, -2.8, 19], [1.0, -2.8, 0]],
+  laterale: [[-18, -2, 1], [0, -2.8, 0]],
+  posteriore: [[1.0, -2.0, -19], [1.0, -2.8, 0]],
+  scapola: [[-7, 1, -14], [1.0, -1.0, 0]],
+  spalla: [[-12, 3, 14], [0.5, -0.8, 0]],
+  avambraccio: [[-7, 1.5, 9], [0, -3, 1.6]],
+  mano: [[-3, -5.2, 6.5], [0, -6.4, 0.3]],
+};
+// Il modello realistico è in metri, con la spalla destra circa qui:
+// 1 unità del modello schematico corrisponde a ~10 cm.
+const SCALA_REALISTICO = 0.1;
+const SPALLA_REALISTICO = [-0.165, 1.395, -0.02];
+
+// Gerarchia dello scheletro di animazione del modello realistico
+const OSSA_REALISTICO = [
+  ["tronco", null], ["cingolo", "tronco"], ["spalla", "cingolo"], ["gomito", "spalla"], ["avambraccio", "gomito"], ["polso", "avambraccio"],
+  ...[2, 3, 4, 5].flatMap((d) => [[`dito${d}_mcf`, "polso"], [`dito${d}_ifp`, `dito${d}_mcf`], [`dito${d}_ifd`, `dito${d}_ifp`]]),
+  ["pollice_cmc", "polso"], ["pollice_mcf", "pollice_cmc"], ["pollice_if", "pollice_mcf"],
+];
 
 export class Visualizzatore {
-  constructor(contenitore, { regione = "superiore", onMuscoloClick, onMuscoloHover } = {}) {
+  constructor(contenitore, { regione = "superiore", modello = "schematico", urlModello, onCaricamento, onMuscoloClick, onMuscoloHover } = {}) {
     this.contenitore = contenitore;
     this.onMuscoloClick = onMuscoloClick;
     this.onMuscoloHover = onMuscoloHover;
     this.articolazioni = {}; // nome -> { obj, riposo: {r: Euler, p: Vector3} }
     this.muscoli = {}; // id -> [Mesh]
+    this.altriMuscoli = []; // muscoli del modello realistico senza scheda
+    this.nervi = {}; // id -> [Mesh] (solo modello realistico)
+    this.scalaPosa = 1; // fattore per le traslazioni delle pose
     this.movimento = null;
     this.velocita = 1;
     this.ampiezza = 1; // <1 simula un deficit di forza (escursione ridotta)
@@ -33,8 +65,13 @@ export class Visualizzatore {
     this.fase = 0;
 
     this._initScena();
+    this.pronto = Promise.resolve();
     if (regione === "inferiore") this._costruisciArtoInferiore();
-    else this._costruisciArtoSuperiore();
+    else if (modello === "realistico") {
+      this.realistico = true;
+      this._impostaVisteRealistiche(SPALLA_REALISTICO);
+      this.pronto = this._caricaRealistico(urlModello, onCaricamento);
+    } else this._costruisciArtoSuperiore();
     this.vista("generale");
     this._initInterazione();
     this._loop = this._loop.bind(this);
@@ -100,15 +137,7 @@ export class Visualizzatore {
 
   _costruisciArtoSuperiore() {
     this.lunghezze = { braccio: L_BRACCIO, avambraccio: L_AVAMBRACCIO };
-    this.viste = {
-      generale: [[-8, 2, 16], [1.0, -2.8, 0]],
-      anteriore: [[1.0, -2.8, 19], [1.0, -2.8, 0]],
-      laterale: [[-18, -2, 1], [0, -2.8, 0]],
-      posteriore: [[1.0, -2.0, -19], [1.0, -2.8, 0]],
-      scapola: [[-7, 1, -14], [1.0, -1.0, 0]],
-      avambraccio: [[-7, 1.5, 9], [0, -3, 1.6]],
-      mano: [[-3, -5.2, 6.5], [0, -6.4, 0.3]],
-    };
+    this.viste = VISTE_SUPERIORE;
     const corpo = new THREE.Group();
     this.scena.add(corpo);
     this.segmenti = { tronco: corpo };
@@ -320,8 +349,148 @@ export class Visualizzatore {
     });
   }
 
-  // Crea i ventri muscolari a partire dalla lista MUSCOLI.
+  // --- Modello realistico (Z-Anatomy)
+
+  _impostaVisteRealistiche(spalla) {
+    const conv = (v) => v.map((c, i) => c * SCALA_REALISTICO + spalla[i]);
+    this.viste = Object.fromEntries(Object.entries(VISTE_SUPERIORE).map(([k, [pos, target]]) => [k, [conv(pos), conv(target)]]));
+    this.camera.near = 0.01;
+    this.camera.updateProjectionMatrix();
+  }
+
+  async _caricaRealistico(url, onCaricamento) {
+    const loader = new GLTFLoader();
+    loader.setMeshoptDecoder(MeshoptDecoder);
+    const gltf = await loader.loadAsync(url, (ev) => onCaricamento?.(ev.total ? ev.loaded / ev.total : null));
+    const info = gltf.scene.userData;
+    this.scalaPosa = SCALA_REALISTICO;
+    this._impostaVisteRealistiche(info.articolazioni.spalla);
+    this.vista(this._vistaCorrente);
+
+    // Scheletro: le ossa hanno orientamento allineato agli assi del mondo, tranne
+    // l'avambraccio, il cui asse y coincide con l'asse di prono-supinazione.
+    const posizioni = { tronco: [0, 1.3, -0.05], ...info.articolazioni };
+    const [testaRadio, testaUlna] = info.assePronoSupinazione.map((p) => new THREE.Vector3(...p));
+    const qMondo = { avambraccio: new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), testaRadio.clone().sub(testaUlna).normalize()) };
+    const ossa = {};
+    for (const [nome, padre] of OSSA_REALISTICO) {
+      const b = new THREE.Bone();
+      b.name = nome;
+      const qPadre = (padre && qMondo[padre]) || new THREE.Quaternion();
+      const q = qMondo[nome] || new THREE.Quaternion();
+      const p = new THREE.Vector3(...posizioni[nome]);
+      if (padre) p.sub(new THREE.Vector3(...posizioni[padre])).applyQuaternion(qPadre.clone().invert());
+      b.position.copy(p);
+      b.quaternion.copy(qPadre.clone().invert().multiply(q));
+      if (padre) ossa[padre].add(b);
+      ossa[nome] = b;
+      if (padre) this.articolazioni[nome] = { obj: b, riposo: { q: b.quaternion.clone(), p: b.position.clone() } };
+    }
+    const radice = ossa.tronco;
+    this.scena.add(radice);
+    radice.updateMatrixWorld(true);
+    const elencoOssa = OSSA_REALISTICO.map(([n]) => n);
+    const scheletro = new THREE.Skeleton(elencoOssa.map((n) => ossa[n]));
+
+    // Segmenti ossei per i pesi di deformazione
+    const segmenti = [];
+    for (const [nome, lista] of Object.entries(info.segmenti)) {
+      for (const [a, b] of lista) segmenti.push({ indice: elencoOssa.indexOf(nome), a: new THREE.Vector3(...a), b: new THREE.Vector3(...b) });
+    }
+
+    const materiali = {
+      osso: () => new THREE.MeshStandardMaterial({ color: COLORE_OSSO, roughness: 0.6 }),
+      contesto: () => new THREE.MeshStandardMaterial({ color: COLORE_OSSO, roughness: 0.7, transparent: true, opacity: 0.35, depthWrite: false }),
+      muscolo: () => new THREE.MeshStandardMaterial({ color: COLORE_MUSCOLO, roughness: 0.55, transparent: true, opacity: 0.9 }),
+      nervo: () => new THREE.MeshStandardMaterial({ color: COLORE_NERVO, roughness: 0.4 }),
+    };
+    const mesh = [];
+    gltf.scene.updateMatrixWorld(true);
+    gltf.scene.traverse((o) => o.isMesh && mesh.push(o));
+    for (const o of mesh) {
+      const d = o.userData;
+      const geo = this._geometriaMondo(o);
+      if (d.tipo === "osso" || d.tipo === "contesto") this._pesoRigido(geo, elencoOssa.indexOf(d.osso));
+      else this._pesiDaSegmenti(geo, segmenti);
+      const sm = new THREE.SkinnedMesh(geo, materiali[d.tipo]());
+      sm.frustumCulled = false;
+      sm.userData = { tipo: d.tipo, id: d.id || null, nome: d.nome };
+      if (d.tipo === "muscolo") sm.userData.muscolo = d.id || null;
+      this.scena.add(sm);
+      sm.bind(scheletro, new THREE.Matrix4());
+      if (d.tipo === "muscolo") (d.id ? (this.muscoli[d.id] ||= []) : this.altriMuscoli).push(sm);
+      if (d.tipo === "nervo") (this.nervi[d.id] ||= []).push(sm);
+    }
+    this.fonte = info.fonte;
+    if (this._statiMuscoli) this.coloraMuscoli(...this._statiMuscoli);
+    if (this._statiNervi) this.coloraNervi(...this._statiNervi);
+    if (this.movimento) this.impostaMovimento(this.movimento);
+  }
+
+  // Copia la geometria in coordinate del mondo e in float (il file è quantizzato)
+  _geometriaMondo(o) {
+    const src = o.geometry.attributes.position;
+    const pos = new Float32Array(src.count * 3);
+    const v = new THREE.Vector3();
+    for (let i = 0; i < src.count; i++) {
+      v.fromBufferAttribute(src, i).applyMatrix4(o.matrixWorld);
+      pos.set([v.x, v.y, v.z], i * 3);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    if (o.geometry.index) geo.setIndex(Array.from(o.geometry.index.array));
+    geo.computeVertexNormals();
+    return geo;
+  }
+
+  _pesoRigido(geo, indice) {
+    const n = geo.attributes.position.count;
+    const idx = new Uint16Array(n * 4);
+    const w = new Float32Array(n * 4);
+    for (let i = 0; i < n; i++) (idx[i * 4] = indice), (w[i * 4] = 1);
+    geo.setAttribute("skinIndex", new THREE.BufferAttribute(idx, 4));
+    geo.setAttribute("skinWeight", new THREE.BufferAttribute(w, 4));
+  }
+
+  // Ogni vertice è legato alle ossa più vicine; la transizione è più morbida
+  // per i vertici lontani dalle ossa (es. muscoli del tronco).
+  _pesiDaSegmenti(geo, segmenti) {
+    const pos = geo.attributes.position;
+    const n = pos.count;
+    const idx = new Uint16Array(n * 4);
+    const w = new Float32Array(n * 4);
+    const p = new THREE.Vector3();
+    const tmp = new THREE.Vector3();
+    const ab = new THREE.Vector3();
+    const perOsso = new Map();
+    for (let i = 0; i < n; i++) {
+      p.fromBufferAttribute(pos, i);
+      perOsso.clear();
+      for (const s of segmenti) {
+        ab.subVectors(s.b, s.a);
+        const t = THREE.MathUtils.clamp(tmp.subVectors(p, s.a).dot(ab) / ab.lengthSq(), 0, 1);
+        const d = tmp.copy(s.a).addScaledVector(ab, t).distanceTo(p);
+        if (!perOsso.has(s.indice) || d < perOsso.get(s.indice)) perOsso.set(s.indice, d);
+      }
+      const ordinati = [...perOsso.entries()].sort((x, y) => x[1] - y[1]).slice(0, 4);
+      const dMin = ordinati[0][1];
+      const sigma = 0.004 + 0.3 * dMin;
+      let somma = 0;
+      ordinati.forEach(([ossoI, d], j) => {
+        const peso = Math.exp(-(((d - dMin) / sigma) ** 2));
+        idx[i * 4 + j] = ossoI;
+        w[i * 4 + j] = peso;
+        somma += peso;
+      });
+      for (let j = 0; j < 4; j++) w[i * 4 + j] /= somma;
+    }
+    geo.setAttribute("skinIndex", new THREE.BufferAttribute(idx, 4));
+    geo.setAttribute("skinWeight", new THREE.BufferAttribute(w, 4));
+  }
+
+  // Crea i ventri muscolari a partire dalla lista MUSCOLI (solo modello schematico).
   aggiungiMuscoli(listaMuscoli) {
+    if (this.realistico) return;
     const lunghezze = this.lunghezze;
     for (const m of listaMuscoli) {
       const mesh = [];
@@ -353,7 +522,8 @@ export class Visualizzatore {
 
   // stati: { idMuscolo: { colore, opacita, emissivo } }; i muscoli assenti tornano allo stato base
   coloraMuscoli(stati = {}, base = { colore: COLORE_MUSCOLO, opacita: 0.35 }) {
-    for (const [id, meshes] of Object.entries(this.muscoli)) {
+    this._statiMuscoli = [stati, base];
+    for (const [id, meshes] of [...Object.entries(this.muscoli), ["", this.altriMuscoli]]) {
       const s = stati[id] || base;
       for (const mesh of meshes) {
         mesh.material.color.set(s.colore ?? COLORE_MUSCOLO);
@@ -361,6 +531,21 @@ export class Visualizzatore {
         mesh.material.emissive.set(s.emissivo ?? 0x000000);
         mesh.material.depthWrite = (s.opacita ?? 0.9) > 0.5;
         mesh.visible = (s.opacita ?? 0.9) > 0.02;
+      }
+    }
+  }
+
+  // stati: { idNervo: { colore, opacita } } (solo modello realistico)
+  coloraNervi(stati = {}, base = { colore: COLORE_NERVO, opacita: 1 }) {
+    this._statiNervi = [stati, base];
+    for (const [id, meshes] of Object.entries(this.nervi)) {
+      const s = stati[id] || base;
+      for (const mesh of meshes) {
+        mesh.material.color.set(s.colore ?? COLORE_NERVO);
+        mesh.material.emissive.set(stati[id] ? 0x333333 : 0x000000);
+        mesh.material.transparent = (s.opacita ?? 1) < 1;
+        mesh.material.opacity = s.opacita ?? 1;
+        mesh.visible = (s.opacita ?? 1) > 0.02;
       }
     }
   }
@@ -374,11 +559,20 @@ export class Visualizzatore {
 
   _applicaPosa(da, a, k) {
     const e = new THREE.Euler();
+    const q = new THREE.Quaternion();
+    const s = this.scalaPosa;
     for (const [nome, { obj, riposo }] of Object.entries(this.articolazioni)) {
       const r0 = da[nome]?.r || [0, 0, 0];
       const r1 = a[nome]?.r || [0, 0, 0];
       const p0 = da[nome]?.p || [0, 0, 0];
       const p1 = a[nome]?.p || [0, 0, 0];
+      if (riposo.q) {
+        // modello realistico: rotazione composta con l'orientamento di riposo dell'osso
+        e.set(...[0, 1, 2].map((i) => (r0[i] + (r1[i] - r0[i]) * k) * DEG));
+        obj.quaternion.copy(riposo.q).multiply(q.setFromEuler(e));
+        obj.position.set(...[0, 1, 2].map((i) => riposo.p.getComponent(i) + (p0[i] + (p1[i] - p0[i]) * k) * s));
+        continue;
+      }
       e.set(
         riposo.r.x + (r0[0] + (r1[0] - r0[0]) * k) * DEG,
         riposo.r.y + (r0[1] + (r1[1] - r0[1]) * k) * DEG,
@@ -403,7 +597,8 @@ export class Visualizzatore {
     if (this.movimento) {
       if (!this.inPausa && this.faseManuale == null) this._t = (this._t || 0) + dt * this.velocita;
       const k = (this.faseManuale ?? (1 - Math.cos(this._t * 1.6)) / 2) * this.ampiezza;
-      this._applicaPosa(this.movimento.da || {}, this.movimento.a || {}, k);
+      const mv = (this.realistico && this.movimento.realistico) || this.movimento;
+      this._applicaPosa(mv.da || this.movimento.da || {}, mv.a || {}, k);
     }
     this.controlli.update();
     this.renderer.render(this.scena, this.camera);
@@ -418,22 +613,29 @@ export class Visualizzatore {
       const r = el.getBoundingClientRect();
       mouse.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
       ray.setFromCamera(mouse, this.camera);
-      const visibili = Object.values(this.muscoli).flat().filter((m) => m.visible);
-      return ray.intersectObjects(visibili, false)[0]?.object.userData.muscolo || null;
+      const visibili = [...Object.values(this.muscoli).flat(), ...this.altriMuscoli, ...Object.values(this.nervi).flat()].filter((m) => m.visible);
+      const o = ray.intersectObjects(visibili, false)[0]?.object;
+      if (!o) return null;
+      return o.userData.tipo ? o.userData : { tipo: "muscolo", id: o.userData.muscolo };
     };
     let giu = null;
     el.addEventListener("pointerdown", (ev) => (giu = [ev.clientX, ev.clientY]));
     el.addEventListener("pointerup", (ev) => {
       if (!giu || Math.hypot(ev.clientX - giu[0], ev.clientY - giu[1]) > 5) return;
-      const id = colpito(ev);
-      if (id && this.onMuscoloClick) this.onMuscoloClick(id);
+      const info = colpito(ev);
+      if (info && this.onMuscoloClick) this.onMuscoloClick(info);
     });
+    // Il raycast sulle mesh deformate è costoso: al massimo ~12 volte al secondo
+    let ultimo = 0;
     el.addEventListener("pointermove", (ev) => {
-      if (this.onMuscoloHover) this.onMuscoloHover(colpito(ev), ev);
+      if (!this.onMuscoloHover || ev.timeStamp - ultimo < 80) return;
+      ultimo = ev.timeStamp;
+      this.onMuscoloHover(colpito(ev), ev);
     });
   }
 
   vista(nome) {
+    this._vistaCorrente = nome;
     const [pos, target] = this.viste[nome] || this.viste.generale;
     this.camera.position.set(...pos);
     this.controlli.target.set(...target);
