@@ -1,11 +1,11 @@
 # Modelli 3D: dallo schema al modello realistico
 
 ## Stato attuale
-- **Arto superiore: modello realistico** derivato da Z-Anatomy (CC BY-SA 4.0), in
-  `assets/models/arto-superiore.glb` (~2 MB). Ossa rigide; muscoli e nervi deformati da uno
+- **Modelli realistici** derivati da Z-Anatomy (CC BY-SA 4.0): `assets/models/arto-superiore.glb`
+  (~2 MB) e `assets/models/arto-inferiore.glb` (~1,2 MB). Ossa rigide; muscoli e nervi deformati da uno
   scheletro di animazione costruito al caricamento sui centri articolari calcolati dallo script
-  `tools/modelli/estrai-arto-superiore.mjs`. Licenza e attribuzioni: `assets/models/LICENZA.md`.
-- **Arto inferiore** (e alternativa per il superiore): modello **schematico** generato via codice.
+  `tools/modelli/estrai.mjs`. Licenza e attribuzioni: `assets/models/LICENZA.md`.
+- **Modelli schematici** generati via codice, selezionabili come alternativa.
 
 I movimenti (`assets/js/data/arto-*.js`, array `MOVIMENTI`) agiscono solo su **articolazioni con nome**,
 quindi guidano entrambi i modelli. Un movimento può definire `realistico: { da, a }` quando la posa

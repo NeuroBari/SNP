@@ -16,7 +16,7 @@ assets/js/data/arto-inferiore.js   nervi, muscoli, movimenti, plesso lombosacral
 assets/js/data/regioni.js          indici comuni e logica delle lesioni
 assets/js/data/fonti.js            bibliografia
 assets/js/viewer3d.js              motore 3D (three.js, incluso in assets/vendor)
-assets/models/arto-superiore.glb   modello realistico (Z-Anatomy, CC BY-SA 4.0)
+assets/models/arto-*.glb           modelli realistici (Z-Anatomy, CC BY-SA 4.0)
 tools/modelli/                     script di estrazione del modello da Z-Anatomy
 docs/MODELLI-3D.md                 come integrare modelli anatomici realistici
 ```
@@ -34,6 +34,6 @@ Settings → Pages → *Deploy from a branch* → scegliere il branch e la carte
 ## Contenuti
 I contenuti sono una prima stesura da revisionare sulle fonti citate in ogni scheda.
 ## Licenze
-- Modello 3D dell'arto superiore: derivato da **Z-Anatomy** (CC BY-SA 4.0) e **BodyParts3D**, © DBCLS (CC BY-SA 2.1 JP);
-  distribuito con licenza CC BY-SA 4.0. Dettagli e modifiche in `assets/models/LICENZA.md`.
+- Modelli 3D degli arti: derivati da **Z-Anatomy** (CC BY-SA 4.0) e **BodyParts3D**, © DBCLS (CC BY-SA 2.1 JP);
+  distribuiti con licenza CC BY-SA 4.0. Dettagli e modifiche in `assets/models/LICENZA.md`.
 - three.js e meshoptimizer: licenza MIT (`assets/vendor/three/`).

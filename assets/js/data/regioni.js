@@ -14,9 +14,9 @@ function crea(id, nome, modello, nervoIniziale, dati, modelloRealistico = null) 
 }
 
 export const REGIONI = {
-  // Il modello realistico deriva da Z-Anatomy (CC BY-SA 4.0): vedi assets/models/LICENZA.md
+  // I modelli realistici derivano da Z-Anatomy (CC BY-SA 4.0): vedi assets/models/LICENZA.md
   superiore: crea("superiore", "Arto superiore", "Arto superiore destro", "radiale", superiore, "assets/models/arto-superiore.glb"),
-  inferiore: crea("inferiore", "Arto inferiore", "Arto inferiore destro", "peroneo", inferiore),
+  inferiore: crea("inferiore", "Arto inferiore", "Arto inferiore destro", "peroneo", inferiore, "assets/models/arto-inferiore.glb"),
 };
 
 // Trova la regione che contiene un nervo (gli id dei nervi sono unici tra le regioni)

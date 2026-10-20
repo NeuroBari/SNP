@@ -3,8 +3,8 @@
 // Due modelli possibili:
 //  - SCHEMATICO, procedurale: segmenti (es. braccio, avambraccio, mano, dita)
 //    collegati da articolazioni con nomi fissi;
-//  - REALISTICO (solo arto superiore): ossa, muscoli e nervi di Z-Anatomy
-//    (CC BY-SA 4.0) caricati da assets/models/arto-superiore.glb. Le ossa seguono
+//  - REALISTICO: ossa, muscoli e nervi di Z-Anatomy (CC BY-SA 4.0) caricati da
+//    assets/models/arto-<regione>.glb. Le ossa seguono
 //    rigidamente le articolazioni, muscoli e nervi si deformano con pesi calcolati
 //    dalla distanza dai segmenti ossei.
 // I movimenti in `data/arto-*.js` agiscono solo sui nomi delle articolazioni,
@@ -36,17 +36,20 @@ const VISTE_SUPERIORE = {
   avambraccio: [[-7, 1.5, 9], [0, -3, 1.6]],
   mano: [[-3, -5.2, 6.5], [0, -6.4, 0.3]],
 };
-// Il modello realistico è in metri, con la spalla destra circa qui:
-// 1 unità del modello schematico corrisponde a ~10 cm.
-const SCALA_REALISTICO = 0.1;
-const SPALLA_REALISTICO = [-0.165, 1.395, -0.02];
-
-// Gerarchia dello scheletro di animazione del modello realistico
-const OSSA_REALISTICO = [
-  ["tronco", null], ["cingolo", "tronco"], ["spalla", "cingolo"], ["gomito", "spalla"], ["avambraccio", "gomito"], ["polso", "avambraccio"],
-  ...[2, 3, 4, 5].flatMap((d) => [[`dito${d}_mcf`, "polso"], [`dito${d}_ifp`, `dito${d}_mcf`], [`dito${d}_ifd`, `dito${d}_ifp`]]),
-  ["pollice_cmc", "polso"], ["pollice_mcf", "pollice_cmc"], ["pollice_if", "pollice_mcf"],
-];
+const VISTE_INFERIORE = {
+  generale: [[-12, 1.5, 22], [1.0, -3.3, 0]],
+  anteriore: [[1.0, -3.0, 25], [1.0, -3.3, 0]],
+  laterale: [[-25, -1.5, 2], [0, -3.3, 0]],
+  posteriore: [[1.0, -2.0, -25], [1.0, -3.3, 0]],
+  piede: [[-4.5, -6.2, 6.5], [0, -8.5, 0.8]],
+};
+// Il modello realistico è in metri; le viste si ricavano da quelle schematiche
+// (1 unità ≈ 10 cm) centrate sulla spalla o sull'anca. Queste sono le posizioni
+// approssimate usate prima che il file sia caricato.
+const VISTE_REALISTICHE = {
+  superiore: { base: VISTE_SUPERIORE, scala: 0.1, origine: [-0.165, 1.395, -0.02] },
+  inferiore: { base: VISTE_INFERIORE, scala: 0.1, origine: [-0.079, 0.862, -0.006] },
+};
 
 export class Visualizzatore {
   constructor(contenitore, { regione = "superiore", modello = "schematico", urlModello, onCaricamento, onMuscoloClick, onMuscoloHover } = {}) {
@@ -66,12 +69,13 @@ export class Visualizzatore {
 
     this._initScena();
     this.pronto = Promise.resolve();
-    if (regione === "inferiore") this._costruisciArtoInferiore();
-    else if (modello === "realistico") {
+    if (modello === "realistico") {
       this.realistico = true;
-      this._impostaVisteRealistiche(SPALLA_REALISTICO);
+      this._visteRealistiche = VISTE_REALISTICHE[regione];
+      this._impostaVisteRealistiche(this._visteRealistiche.origine);
       this.pronto = this._caricaRealistico(urlModello, onCaricamento);
-    } else this._costruisciArtoSuperiore();
+    } else if (regione === "inferiore") this._costruisciArtoInferiore();
+    else this._costruisciArtoSuperiore();
     this.vista("generale");
     this._initInterazione();
     this._loop = this._loop.bind(this);
@@ -246,13 +250,7 @@ export class Visualizzatore {
 
   _costruisciArtoInferiore() {
     this.lunghezze = { coscia: L_COSCIA, gamba: L_GAMBA };
-    this.viste = {
-      generale: [[-11, 1, 20], [1.0, -3.8, 0]],
-      anteriore: [[1.0, -3.5, 24], [1.0, -3.8, 0]],
-      laterale: [[-23, -2, 2], [0, -3.8, 0]],
-      posteriore: [[1.0, -2.5, -24], [1.0, -3.8, 0]],
-      piede: [[-4.5, -6.2, 6.5], [0, -8.5, 0.8]],
-    };
+    this.viste = VISTE_INFERIORE;
     const corpo = new THREE.Group();
     this.scena.add(corpo);
     this.segmenti = { bacino: corpo };
@@ -351,9 +349,10 @@ export class Visualizzatore {
 
   // --- Modello realistico (Z-Anatomy)
 
-  _impostaVisteRealistiche(spalla) {
-    const conv = (v) => v.map((c, i) => c * SCALA_REALISTICO + spalla[i]);
-    this.viste = Object.fromEntries(Object.entries(VISTE_SUPERIORE).map(([k, [pos, target]]) => [k, [conv(pos), conv(target)]]));
+  _impostaVisteRealistiche(origine) {
+    const { base, scala } = this._visteRealistiche;
+    const conv = (v) => v.map((c, i) => c * scala + origine[i]);
+    this.viste = Object.fromEntries(Object.entries(base).map(([k, [pos, target]]) => [k, [conv(pos), conv(target)]]));
     this.camera.near = 0.01;
     this.camera.updateProjectionMatrix();
   }
@@ -363,17 +362,21 @@ export class Visualizzatore {
     loader.setMeshoptDecoder(MeshoptDecoder);
     const gltf = await loader.loadAsync(url, (ev) => onCaricamento?.(ev.total ? ev.loaded / ev.total : null));
     const info = gltf.scene.userData;
-    this.scalaPosa = SCALA_REALISTICO;
-    this._impostaVisteRealistiche(info.articolazioni.spalla);
+    this.scalaPosa = info.viste.scala;
+    this._visteRealistiche.scala = info.viste.scala;
+    this._impostaVisteRealistiche(info.articolazioni[info.viste.origine]);
     this.vista(this._vistaCorrente);
 
     // Scheletro: le ossa hanno orientamento allineato agli assi del mondo, tranne
-    // l'avambraccio, il cui asse y coincide con l'asse di prono-supinazione.
-    const posizioni = { tronco: [0, 1.3, -0.05], ...info.articolazioni };
-    const [testaRadio, testaUlna] = info.assePronoSupinazione.map((p) => new THREE.Vector3(...p));
-    const qMondo = { avambraccio: new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), testaRadio.clone().sub(testaUlna).normalize()) };
+    // quelle elencate in `info.assi` (es. avambraccio: asse y = asse di prono-supinazione).
+    const posizioni = { tronco: info.tronco, ...info.articolazioni };
+    const qMondo = {};
+    for (const [nome, [a, b]] of Object.entries(info.assi)) {
+      const dir = new THREE.Vector3(...b).sub(new THREE.Vector3(...a)).normalize();
+      qMondo[nome] = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+    }
     const ossa = {};
-    for (const [nome, padre] of OSSA_REALISTICO) {
+    for (const [nome, padre, alias] of info.gerarchia) {
       const b = new THREE.Bone();
       b.name = nome;
       const qPadre = (padre && qMondo[padre]) || new THREE.Quaternion();
@@ -384,12 +387,12 @@ export class Visualizzatore {
       b.quaternion.copy(qPadre.clone().invert().multiply(q));
       if (padre) ossa[padre].add(b);
       ossa[nome] = b;
-      if (padre) this.articolazioni[nome] = { obj: b, riposo: { q: b.quaternion.clone(), p: b.position.clone() } };
+      if (padre) this.articolazioni[nome] = { obj: b, alias, riposo: { q: b.quaternion.clone(), p: b.position.clone() } };
     }
     const radice = ossa.tronco;
     this.scena.add(radice);
     radice.updateMatrixWorld(true);
-    const elencoOssa = OSSA_REALISTICO.map(([n]) => n);
+    const elencoOssa = info.gerarchia.map(([n]) => n);
     const scheletro = new THREE.Skeleton(elencoOssa.map((n) => ossa[n]));
 
     // Segmenti ossei per i pesi di deformazione
@@ -561,7 +564,8 @@ export class Visualizzatore {
     const e = new THREE.Euler();
     const q = new THREE.Quaternion();
     const s = this.scalaPosa;
-    for (const [nome, { obj, riposo }] of Object.entries(this.articolazioni)) {
+    for (const [nomeOsso, { obj, riposo, alias }] of Object.entries(this.articolazioni)) {
+      const nome = alias || nomeOsso; // più ossa possono condividere la stessa posa (es. dita del piede)
       const r0 = da[nome]?.r || [0, 0, 0];
       const r1 = a[nome]?.r || [0, 0, 0];
       const p0 = da[nome]?.p || [0, 0, 0];

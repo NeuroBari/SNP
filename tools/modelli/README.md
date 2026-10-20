@@ -1,6 +1,6 @@
 # Estrazione dei modelli 3D da Z-Anatomy
 
-Produce `assets/models/arto-superiore.glb` (CC BY-SA 4.0, vedi `assets/models/LICENZA.md`).
+Produce `assets/models/arto-superiore.glb` e `assets/models/arto-inferiore.glb` (CC BY-SA 4.0, vedi `assets/models/LICENZA.md`).
 
 ## Requisiti
 Node.js ≥ 18. Nessun software grafico necessario.
@@ -21,14 +21,18 @@ for f in SkeletalSystem100 MuscularSystem100 NervousSystem100; do
 done
 # (su macOS/Windows usare bin/Darwin o bin/Windows_NT; se il file non è eseguibile: chmod +x)
 
-# 4. Estrarre l'arto superiore destro
-node estrai-arto-superiore.mjs /tmp/za-glb ../../assets/models/arto-superiore.glb
+# 4. Estrarre gli arti destri
+node estrai.mjs superiore /tmp/za-glb
+node estrai.mjs inferiore /tmp/za-glb
 ```
 
 ## Cosa fa lo script
 - seleziona per nome (lato destro, suffisso `.r`) ossa, muscoli e nervi e li associa agli
-  identificativi usati nei dati del sito (`assets/js/data/arto-superiore.js`);
-- calcola i centri articolari (spalla, gomito, prono-supinazione, polso, dita) dalla geometria delle ossa;
-- semplifica e comprime le mesh (~2 MB in totale).
+  identificativi usati nei dati del sito (`assets/js/data/arto-*.js`); le tabelle sono in `regioni/<regione>.mjs`;
+- calcola i centri articolari (spalla, gomito, prono-supinazione, polso, dita; anca, ginocchio,
+  caviglia, dita del piede) dalla geometria delle ossa;
+- semplifica e comprime le mesh (~2 MB per l'arto superiore, ~1,2 MB per l'inferiore).
 
-Per aggiungere una struttura: inserire il nome Z-Anatomy nelle tabelle `MUSCOLI`/`NERVI` dello script.
+Per aggiungere una struttura: inserire il nome Z-Anatomy nelle tabelle `MUSCOLI`/`NERVI` di `regioni/<regione>.mjs`.
+
+Limiti noti del modello Z-Anatomy usato: non contiene il nervo gluteo inferiore né il tensore della fascia lata come muscolo separato.

@@ -1,29 +1,18 @@
-// Estrae l'arto superiore destro (ossa, muscoli, nervi) dai modelli Z-Anatomy
-// e produce assets/models/arto-superiore.glb per il visualizzatore 3D.
-//
-// Fonte: Z-Anatomy (CC BY-SA 4.0), derivato da BodyParts3D (DBCLS, CC BY-SA 2.1 JP).
-// Il file prodotto è un'opera derivata e va distribuito con la stessa licenza:
-// vedi assets/models/LICENZA.md.
-//
-// Uso (vedi README.md in questa cartella):
-//   node estrai-arto-superiore.mjs <cartella con i .glb convertiti> [file di uscita]
+// Configurazione dell'estrazione: arto superiore destro.
+import { X, Y, media, estremo } from "../geometria.mjs";
 
-import { NodeIO, Document } from "@gltf-transform/core";
-import { EXTMeshoptCompression, KHRMeshQuantization } from "@gltf-transform/extensions";
-import { weld, simplify, quantize, prune, reorder } from "@gltf-transform/functions";
-import { MeshoptEncoder, MeshoptSimplifier } from "meshoptimizer";
-import path from "node:path";
+export const NOME = "Arto superiore destro";
 
-const [cartella, uscita = "../../assets/models/arto-superiore.glb"] = process.argv.slice(2);
-if (!cartella) {
-  console.error("Uso: node estrai-arto-superiore.mjs <cartella con SkeletalSystem100.glb, MuscularSystem100.glb, NervousSystem100.glb> [uscita]");
-  process.exit(1);
-}
+// Scheletro di animazione: [articolazione, padre, alias della posa]
+const GERARCHIA = [
+  ["tronco", null], ["cingolo", "tronco"], ["spalla", "cingolo"], ["gomito", "spalla"], ["avambraccio", "gomito"], ["polso", "avambraccio"],
+  ...[2, 3, 4, 5].flatMap((d) => [[`dito${d}_mcf`, "polso"], [`dito${d}_ifp`, `dito${d}_mcf`], [`dito${d}_ifd`, `dito${d}_ifp`]]),
+  ["pollice_cmc", "polso"], ["pollice_mcf", "pollice_cmc"], ["pollice_if", "pollice_mcf"],
+];
 
-// ---------------------------------------------------------------------------
 // Selezione delle strutture: nome Z-Anatomy (lato destro, suffisso .r) -> id del sito
 
-const OSSA = {
+export const OSSA = {
   "Clavicle.r": "cingolo", "Scapula.r": "cingolo", "Humerus.r": "spalla",
   "Ulna.r": "gomito", "Radius.r": "avambraccio",
   "Scaphoid bone.r": "polso", "Lunate bone.r": "polso", "Triquetrum bone.r": "polso", "Pisiform bone.r": "polso",
@@ -42,7 +31,7 @@ for (const [nome, d] of Object.entries(ORDINALI)) {
 // Ossa di contesto (fisse): torace, colonna cervico-toracica, cingolo controlaterale
 const CONTESTO = [/^Vertebra (C[3-7]|T\d+)$/, /rib\.[rl]$/i, /^Costal cartilage of .* rib\.[rl]$/, /sternum$/, /^Xiphoid process$/, /^Clavicle\.l$/, /^Scapula\.l$/];
 
-const MUSCOLI = {
+export const MUSCOLI = {
   trapezio: ["Descending part of trapezius muscle.r", "Transverse part of trapezius muscle.r", "Ascending part of trapezius muscle.r"],
   "elevatore-scapola": ["Levator scapulae.r"],
   romboidi: ["Rhomboid major muscle.r", "Rhomboid minor muscle.r"],
@@ -93,7 +82,7 @@ const MUSCOLI = {
 };
 // Muscoli a doppia innervazione presenti come un'unica mesh: divisi lungo x
 // (x minore = laterale). FDP: indice e medio -> mediano; anulare e mignolo -> ulnare.
-const DA_DIVIDERE = {
+export const DA_DIVIDERE = {
   "Flexor digitorum profundus.r": ["fdp-mediano", "fdp-ulnare"],
   "Lumbrical muscles of hand.r": ["lombricali-mediano", "lombricali-ulnare"],
 };
@@ -114,7 +103,7 @@ const NERVI = {
   plesso: [/brachial plexus\.r$/, /^Medial (brachial|antebrachial) cutaneous nerve\.r$/, /branch of medial antebrachial cutaneous nerve\.r$/, /^Subclavian nerve\.r$/],
 };
 
-function classifica(nome, sorgente) {
+export function classifica(nome, sorgente) {
   if (sorgente === "Skeletal") {
     if (OSSA[nome]) return [{ tipo: "osso", osso: OSSA[nome] }];
     if (CONTESTO.some((re) => re.test(nome))) return [{ tipo: "contesto", osso: "tronco" }];
@@ -130,79 +119,7 @@ function classifica(nome, sorgente) {
   return null;
 }
 
-// ---------------------------------------------------------------------------
-// Lettura e appiattimento delle mesh (trasformazioni applicate ai vertici)
-
-const io = new NodeIO().registerExtensions([EXTMeshoptCompression, KHRMeshQuantization]).registerDependencies({
-  "meshopt.encoder": MeshoptEncoder,
-  "meshopt.decoder": MeshoptEncoder,
-});
-
-function trasforma(m, x, y, z) {
-  return [m[0] * x + m[4] * y + m[8] * z + m[12], m[1] * x + m[5] * y + m[9] * z + m[13], m[2] * x + m[6] * y + m[10] * z + m[14]];
-}
-
-async function estrai(sorgente) {
-  const doc = await io.read(path.join(cartella, `${sorgente}System100.glb`));
-  const scena = doc.getRoot().getDefaultScene() || doc.getRoot().listScenes()[0];
-  const risultati = [];
-  scena.traverse((nodo) => {
-    const mesh = nodo.getMesh();
-    if (!mesh) return;
-    const nome = nodo.getName();
-    const classi = classifica(nome, sorgente);
-    if (!classi) return;
-    const m = nodo.getWorldMatrix();
-    const pos = [];
-    const idx = [];
-    for (const prim of mesh.listPrimitives()) {
-      const a = prim.getAttribute("POSITION");
-      const base = pos.length / 3;
-      for (let i = 0; i < a.getCount(); i++) pos.push(...trasforma(m, ...a.getElement(i, [])));
-      const ind = prim.getIndices();
-      if (ind) for (let i = 0; i < ind.getCount(); i++) idx.push(base + ind.getScalar(i));
-      else for (let i = 0; i < a.getCount(); i++) idx.push(base + i);
-    }
-    if (classi.length === 1) risultati.push({ nome, ...classi[0], pos, idx });
-    else risultati.push(...dividiLungoX(nome, classi, pos, idx));
-  });
-  return risultati;
-}
-
-function dividiLungoX(nome, classi, pos, idx) {
-  let min = Infinity, max = -Infinity;
-  for (let i = 0; i < pos.length; i += 3) (min = Math.min(min, pos[i])), (max = Math.max(max, pos[i]));
-  const soglia = (min + max) / 2;
-  const parti = classi.map(() => []);
-  for (let t = 0; t < idx.length; t += 3) {
-    const cx = (pos[idx[t] * 3] + pos[idx[t + 1] * 3] + pos[idx[t + 2] * 3]) / 3;
-    parti[cx < soglia ? 0 : 1].push(idx[t], idx[t + 1], idx[t + 2]);
-  }
-  return classi.map((c, i) => ({ nome: `${nome} (${i === 0 ? "parte laterale" : "parte mediale"})`, ...c, pos, idx: parti[i] }));
-}
-
-// ---------------------------------------------------------------------------
-// Centri articolari e segmenti ossei (per lo scheletro di animazione)
-
-const vertici = (s) => {
-  const v = [];
-  for (let i = 0; i < s.pos.length; i += 3) v.push([s.pos[i], s.pos[i + 1], s.pos[i + 2]]);
-  return v;
-};
-const media = (pts) => pts.reduce((a, p) => [a[0] + p[0], a[1] + p[1], a[2] + p[2]], [0, 0, 0]).map((x) => +(x / pts.length).toFixed(4));
-const estremo = (v, asse, lato, spessore) => {
-  const vals = v.map((p) => p[asse]);
-  const lim = lato === "max" ? Math.max(...vals) - spessore : Math.min(...vals) + spessore;
-  return media(v.filter((p) => (lato === "max" ? p[asse] >= lim : p[asse] <= lim)));
-};
-const Y = 1, X = 0;
-
-function calcolaScheletro(strutture) {
-  const osso = (nome) => {
-    const s = strutture.find((x) => x.nome === nome);
-    if (!s) throw new Error(`Osso non trovato: ${nome}`);
-    return vertici(s);
-  };
+export function calcolaScheletro(osso) {
   const omero = osso("Humerus.r"), radio = osso("Radius.r"), ulna = osso("Ulna.r");
   const scapola = osso("Scapula.r"), clavicola = osso("Clavicle.r");
   const testaOmero = estremo(omero, Y, "max", 0.035);
@@ -245,57 +162,13 @@ function calcolaScheletro(strutture) {
     segmenti[art] = [[a, b]];
   }
   return {
+    tronco: [0, 1.3, -0.05],
     articolazioni,
     segmenti,
-    // asse di prono-supinazione: dalla testa del radio alla testa dell'ulna
-    assePronoSupinazione: [testaRadio, testaUlna],
+    // l'asse y dell'avambraccio coincide con l'asse di prono-supinazione (dalla testa dell'ulna a quella del radio)
+    assi: { avambraccio: [testaUlna, testaRadio] },
+    gerarchia: GERARCHIA,
+    viste: { scala: 0.1, origine: "spalla" },
   };
 }
 
-// ---------------------------------------------------------------------------
-// Scrittura del glTF
-
-const strutture = [...(await estrai("Skeletal")), ...(await estrai("Muscular")), ...(await estrai("Nervous"))];
-const scheletro = calcolaScheletro(strutture);
-const conteggio = {};
-strutture.forEach((s) => (conteggio[s.tipo] = (conteggio[s.tipo] || 0) + 1));
-console.log("Strutture selezionate:", conteggio);
-const idMuscoliTrovati = new Set(strutture.filter((s) => s.tipo === "muscolo").map((s) => s.id));
-const mancanti = [...Object.keys(MUSCOLI), ...Object.values(DA_DIVIDERE).flat()].filter((id) => !idMuscoliTrovati.has(id));
-if (mancanti.length) console.warn("Muscoli non trovati:", mancanti);
-
-const out = new Document();
-const buffer = out.createBuffer();
-const materiali = {};
-const scena = out.createScene("Arto superiore destro");
-for (const s of strutture) {
-  materiali[s.tipo] ||= out.createMaterial(s.tipo);
-  const posizioni = out.createAccessor().setType("VEC3").setArray(new Float32Array(s.pos)).setBuffer(buffer);
-  const indici = out.createAccessor().setType("SCALAR").setArray(new Uint32Array(s.idx)).setBuffer(buffer);
-  const prim = out.createPrimitive().setAttribute("POSITION", posizioni).setIndices(indici).setMaterial(materiali[s.tipo]);
-  const mesh = out.createMesh(s.nome).addPrimitive(prim);
-  const extras = { tipo: s.tipo, nome: s.nome };
-  if (s.id) extras.id = s.id;
-  if (s.osso) extras.osso = s.osso;
-  scena.addChild(out.createNode(s.nome).setMesh(mesh).setExtras(extras));
-}
-scena.setExtras({
-  ...scheletro,
-  fonte: "Z-Anatomy (CC BY-SA 4.0), derivato da BodyParts3D, The Database Center for Life Science (CC BY-SA 2.1 JP). Modificato: selezione dell'arto superiore destro, semplificazione e compressione.",
-  licenza: "CC BY-SA 4.0",
-});
-out.getRoot().setDefaultScene(scena);
-out.getRoot().getAsset().copyright = "Z-Anatomy (CC BY-SA 4.0); BodyParts3D, DBCLS (CC BY-SA 2.1 JP)";
-
-await MeshoptSimplifier.ready;
-await MeshoptEncoder.ready;
-await out.transform(
-  weld(),
-  simplify({ simplifier: MeshoptSimplifier, ratio: 0.5, error: 0.0004 }),
-  prune(),
-  reorder({ encoder: MeshoptEncoder }),
-  quantize({ quantizePosition: 14 })
-);
-out.createExtension(EXTMeshoptCompression).setRequired(true).setEncoderOptions({ method: EXTMeshoptCompression.EncoderMethod.QUANTIZE });
-await io.write(uscita, out);
-console.log("Scritto", uscita);

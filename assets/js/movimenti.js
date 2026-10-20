@@ -42,7 +42,7 @@ const stato = { movimento: null, nervo: null, lesione: null, muscolo: null };
 
 // Descrizione breve di una struttura del modello (muscolo o nervo)
 function descrivi(info) {
-  if (info.tipo === "nervo") return nervoPerId[info.id] ? `${nervoPerId[info.id].nome} — ${info.nome}` : `Plesso brachiale — ${info.nome}`;
+  if (info.tipo === "nervo") return nervoPerId[info.id] ? `${nervoPerId[info.id].nome} — ${info.nome}` : `${regione.PLESSO.nome} — ${info.nome}`;
   const m = muscoloPerId[info.id];
   return m ? `${m.nome} — ${m.nervi.map((n) => nervoPerId[n].nome).join(", ")}` : `${info.nome} (senza scheda)`;
 }
