@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Anatomia · SNP</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-pagina="anatomia.html">
+  <div id="testata"></div>
+  <main>
+    <h1>Anatomia · Arto superiore</h1>
+    <p class="sottotitolo">Plesso brachiale e nervi dell'arto superiore. Seleziona un nervo dallo schema o dall'elenco.</p>
+
+    <div class="layout-anatomia">
+      <aside class="elenco-nervi scheda" id="elenco-nervi" aria-label="Elenco dei nervi"></aside>
+      <div>
+        <section class="scheda plesso">
+          <h3 style="margin-top:0">Plesso brachiale</h3>
+          <div id="plesso"></div>
+          <p class="piccolo">Schema semplificato: radici → tronchi → divisioni (A anteriore, P posteriore) → corde → nervi terminali; in corsivo i principali rami collaterali. Clicca un nervo per la scheda.</p>
+        </section>
+
+        <section class="scheda" id="scheda-nervo" style="margin-top:16px"></section>
+
+        <section class="scheda" style="margin-top:16px">
+          <h3 style="margin-top:0">Tutti i muscoli</h3>
+          <input type="search" id="cerca-muscolo" placeholder="Cerca muscolo, nervo o radice (es. C8, ulnare, pollice)…" aria-label="Cerca muscolo">
+          <div class="tabella-scorri" style="margin-top:10px">
+            <table>
+              <thead><tr><th>Muscolo</th><th>Nervo</th><th>Radici</th><th>Azione</th><th>Test clinico</th></tr></thead>
+              <tbody id="tabella-muscoli"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+  <div id="pie"></div>
+  <script src="assets/js/layout.js"></script>
+  <script type="module" src="assets/js/anatomia.js"></script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+:root {
+  --bg: #f7f5f2;
+  --bg-2: #ffffff;
+  --testo: #1e2328;
+  --testo-2: #5b636b;
+  --bordo: #e2ddd6;
+  --accento: #1f6f8b;
+  --accento-2: #e6f1f5;
+  --perso: #c0392b;
+  --ridotto: #e08e0b;
+  --lieve: #b7a33a;
+  --conservato: #3c9d5d;
+  --ombra: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 14px rgba(0, 0, 0, 0.05);
+  --raggio: 10px;
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #15181c;
+    --bg-2: #1e2227;
+    --testo: #e7e9eb;
+    --testo-2: #9aa3ab;
+    --bordo: #30363d;
+    --accento: #5bb3d1;
+    --accento-2: #1d3640;
+    --ombra: none;
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--testo);
+  line-height: 1.55;
+  font-size: 16px;
+}
+a { color: var(--accento); }
+h1, h2, h3 { line-height: 1.25; }
+h1 { font-size: 1.9rem; margin: 0.2em 0 0.4em; }
+h2 { font-size: 1.35rem; margin-top: 1.6em; }
+h3 { font-size: 1.08rem; margin: 1.2em 0 0.4em; }
+
+/* Intestazione */
+.testata {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--bordo);
+}
+.testata .barra {
+  max-width: 1280px; margin: 0 auto; padding: 0 16px;
+  display: flex; align-items: center; gap: 20px; min-height: 56px; flex-wrap: wrap;
+}
+.marchio { font-weight: 700; text-decoration: none; color: var(--testo); white-space: nowrap; }
+.marchio span { color: var(--accento); }
+.nav { display: flex; gap: 4px; flex-wrap: wrap; }
+.nav a {
+  text-decoration: none; color: var(--testo-2); padding: 6px 10px; border-radius: 6px; font-size: 0.95rem;
+}
+.nav a:hover { background: var(--accento-2); color: var(--testo); }
+.nav a[aria-current="page"] { color: var(--accento); font-weight: 600; background: var(--accento-2); }
+
+main { max-width: 1280px; margin: 0 auto; padding: 24px 16px 64px; }
+.stretto { max-width: 860px; }
+.sottotitolo { color: var(--testo-2); font-size: 1.05rem; margin-top: 0; }
+
+.avviso {
+  background: var(--accento-2); border-left: 4px solid var(--accento);
+  padding: 10px 14px; border-radius: 6px; font-size: 0.92rem; margin: 16px 0;
+}
+
+/* Schede */
+.griglia { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
+.scheda {
+  background: var(--bg-2); border: 1px solid var(--bordo); border-radius: var(--raggio);
+  padding: 18px; box-shadow: var(--ombra);
+}
+a.scheda { text-decoration: none; color: inherit; display: block; transition: border-color 0.15s; }
+a.scheda:hover { border-color: var(--accento); }
+.scheda h3 { margin-top: 0; }
+.scheda p { margin: 0; color: var(--testo-2); font-size: 0.95rem; }
+.etichetta {
+  display: inline-block; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 2px 8px; border-radius: 99px; background: var(--accento-2); color: var(--accento); margin-bottom: 8px;
+}
+.etichetta.prossimamente { background: var(--bordo); color: var(--testo-2); }
+
+/* Pallini colore nervo */
+.pallino { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: baseline; }
+.chip {
+  display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 99px; font-size: 0.82rem;
+  border: 1px solid var(--bordo); background: var(--bg-2); margin: 2px 4px 2px 0; white-space: nowrap;
+}
+
+/* Layout anatomia */
+.layout-anatomia { display: grid; grid-template-columns: 290px 1fr; gap: 24px; align-items: start; }
+.elenco-nervi { position: sticky; top: 76px; }
+.elenco-nervi h4 { margin: 14px 0 6px; font-size: 0.78rem; text-transform: uppercase; color: var(--testo-2); letter-spacing: 0.05em; }
+.elenco-nervi button {
+  display: flex; align-items: center; width: 100%; text-align: left; border: 0; background: none; color: var(--testo);
+  padding: 6px 8px; border-radius: 6px; cursor: pointer; font: inherit; font-size: 0.93rem;
+}
+.elenco-nervi button:hover { background: var(--accento-2); }
+.elenco-nervi button.attivo { background: var(--accento-2); font-weight: 600; }
+
+.plesso svg { width: 100%; height: auto; display: block; }
+.plesso .arco { stroke: var(--testo-2); stroke-width: 1.6; fill: none; opacity: 0.6; }
+.plesso .nodo text { font-size: 12px; fill: var(--testo); }
+.plesso .nodo.cliccabile { cursor: pointer; }
+.plesso .nodo.cliccabile:hover text { text-decoration: underline; }
+.plesso .titolo-colonna { font-size: 11px; fill: var(--testo-2); text-transform: uppercase; letter-spacing: 0.05em; }
+
+dl.scheda-nervo { display: grid; grid-template-columns: 160px 1fr; gap: 8px 16px; margin: 0; }
+dl.scheda-nervo dt { font-weight: 600; color: var(--testo-2); }
+dl.scheda-nervo dd { margin: 0; }
+.scheda-nervo ul { margin: 0; padding-left: 18px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--bordo); vertical-align: top; }
+th { color: var(--testo-2); font-weight: 600; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.03em; }
+.tabella-scorri { overflow-x: auto; }
+
+.lesione { border-left: 3px solid var(--perso); padding: 4px 0 4px 12px; margin: 10px 0; }
+.lesione strong { display: block; }
+.fonti-voce { font-size: 0.85rem; color: var(--testo-2); }
+
+input[type="search"], select {
+  font: inherit; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--bordo);
+  background: var(--bg-2); color: var(--testo); width: 100%;
+}
+button.btn {
+  font: inherit; font-size: 0.9rem; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--bordo);
+  background: var(--bg-2); color: var(--testo); cursor: pointer;
+}
+button.btn:hover { border-color: var(--accento); }
+button.btn.attivo { background: var(--accento); color: #fff; border-color: var(--accento); }
+
+/* Pagina 3D */
+.layout-3d { display: grid; grid-template-columns: 330px 1fr 340px; gap: 16px; height: calc(100vh - 56px - 48px); min-height: 560px; }
+.pannello { background: var(--bg-2); border: 1px solid var(--bordo); border-radius: var(--raggio); padding: 14px; overflow-y: auto; }
+.scena-3d { position: relative; border-radius: var(--raggio); border: 1px solid var(--bordo); overflow: hidden;
+  background: radial-gradient(circle at 50% 35%, var(--bg-2), var(--bg)); }
+.scena-3d canvas { display: block; }
+.comandi-3d { position: absolute; left: 10px; right: 10px; bottom: 10px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.comandi-3d label { font-size: 0.8rem; color: var(--testo-2); display: flex; align-items: center; gap: 6px; }
+.tooltip-3d { position: absolute; pointer-events: none; background: var(--testo); color: var(--bg); padding: 3px 8px;
+  border-radius: 5px; font-size: 0.8rem; display: none; white-space: nowrap; }
+.legenda-3d { position: absolute; top: 10px; left: 10px; font-size: 0.78rem; background: var(--bg-2); border: 1px solid var(--bordo);
+  border-radius: 8px; padding: 6px 10px; max-width: 60%; opacity: 0.95; }
+.schede-tab { display: flex; gap: 4px; margin-bottom: 12px; }
+.schede-tab button { flex: 1; }
+.gruppo-mov h4 { margin: 12px 0 4px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--testo-2); }
+.voce-mov {
+  display: flex; justify-content: space-between; align-items: center; gap: 6px; width: 100%; text-align: left; border: 0; background: none;
+  color: var(--testo); padding: 5px 8px; border-radius: 6px; cursor: pointer; font: inherit; font-size: 0.9rem;
+}
+.voce-mov:hover { background: var(--accento-2); }
+.voce-mov.attivo { background: var(--accento-2); font-weight: 600; }
+.badge { font-size: 0.7rem; font-weight: 600; padding: 1px 7px; border-radius: 99px; color: #fff; white-space: nowrap; }
+.badge.perso { background: var(--perso); }
+.badge.ridotto { background: var(--ridotto); }
+.badge.lieve { background: var(--lieve); }
+.badge.conservato { background: var(--conservato); }
+.info-muscolo { border-top: 1px solid var(--bordo); padding-top: 8px; margin-top: 8px; font-size: 0.9rem; }
+.info-muscolo h4 { margin: 0 0 4px; }
+.piccolo { font-size: 0.85rem; color: var(--testo-2); }
+
+.pie { border-top: 1px solid var(--bordo); color: var(--testo-2); font-size: 0.85rem; }
+.pie div { max-width: 1280px; margin: 0 auto; padding: 16px; }
+
+@media (max-width: 1100px) {
+  .layout-3d { grid-template-columns: 1fr; height: auto; }
+  .scena-3d { height: 70vh; order: -1; }
+  .pannello { max-height: none; }
+}
+@media (max-width: 800px) {
+  .layout-anatomia { grid-template-columns: 1fr; }
+  .elenco-nervi { position: static; }
+  dl.scheda-nervo { grid-template-columns: 1fr; }
+  dl.scheda-nervo dt { margin-top: 8px; }
+}

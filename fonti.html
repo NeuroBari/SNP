@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fonti · SNP</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-pagina="fonti.html">
+  <div id="testata"></div>
+  <main class="stretto">
+    <h1>Fonti e metodo</h1>
+    <p class="sottotitolo">I contenuti si basano su testi di riferimento e linee guida. Ogni scheda indica le fonti utilizzate.</p>
+    <div class="avviso">
+      <strong>Stato di revisione:</strong> i contenuti della sezione Anatomia sono una prima stesura, da verificare
+      da parte dei curatori sulle fonti indicate. I valori radicolari seguono principalmente <em>Aids to the Examination
+      of the Peripheral Nervous System</em>; dove le fonti divergono è indicato nelle note.
+    </div>
+    <h2>Testi di riferimento</h2>
+    <div id="elenco-fonti"></div>
+    <h2>Modelli 3D</h2>
+    <p>Il modello attuale è schematico e generato via codice (three.js, licenza MIT). L'integrazione di modelli anatomici
+    realistici è descritta nel documento <a href="https://github.com/NeuroBari/SNP/blob/main/docs/MODELLI-3D.md">docs/MODELLI-3D.md</a>.</p>
+  </main>
+  <div id="pie"></div>
+  <script src="assets/js/layout.js"></script>
+  <script type="module">
+    import { FONTI } from "./assets/js/data/fonti.js";
+    document.getElementById("elenco-fonti").innerHTML = Object.values(FONTI)
+      .map((f) => `<div class="scheda" style="margin:10px 0"><strong>${f.completa}</strong><p>${f.nota}</p></div>`)
+      .join("");
+  </script>
+</body>
+</html>

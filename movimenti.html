@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Movimenti 3D · SNP</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script type="importmap">
+    { "imports": {
+        "three": "./assets/vendor/three/three.module.min.js",
+        "three/addons/": "./assets/vendor/three/addons/"
+    } }
+  </script>
+</head>
+<body data-pagina="movimenti.html">
+  <div id="testata"></div>
+  <main style="max-width:none;padding-bottom:16px">
+    <div class="layout-3d">
+      <aside class="pannello" aria-label="Selezione">
+        <div class="schede-tab" role="tablist">
+          <button class="btn attivo" data-tab="movimenti" role="tab">Movimenti</button>
+          <button class="btn" data-tab="lesioni" role="tab">Nervi e lesioni</button>
+        </div>
+        <div id="tab-movimenti"></div>
+        <div id="tab-lesioni" hidden>
+          <label class="piccolo" for="sel-nervo">Nervo</label>
+          <select id="sel-nervo"></select>
+          <div id="siti-lesione" style="margin-top:10px"></div>
+          <div id="effetti-lesione" style="margin-top:10px"></div>
+        </div>
+      </aside>
+
+      <section class="scena-3d" id="scena" aria-label="Modello 3D dell'arto superiore destro">
+        <div class="legenda-3d" id="legenda">Arto superiore destro · modello schematico. Trascina per ruotare, rotella per zoom, clic su un muscolo per i dettagli.</div>
+        <div class="tooltip-3d" id="tooltip"></div>
+        <div class="comandi-3d">
+          <button class="btn" data-vista="generale">Generale</button>
+          <button class="btn" data-vista="anteriore">Anteriore</button>
+          <button class="btn" data-vista="laterale">Laterale</button>
+          <button class="btn" data-vista="posteriore">Posteriore</button>
+          <button class="btn" data-vista="mano">Mano</button>
+          <button class="btn" id="pausa">Pausa</button>
+          <label>Velocità <input type="range" id="velocita" min="0.2" max="2" step="0.1" value="1"></label>
+          <label><input type="checkbox" id="tutti-muscoli" checked> tutti i muscoli</label>
+        </div>
+      </section>
+
+      <aside class="pannello" id="info" aria-live="polite"></aside>
+    </div>
+  </main>
+  <script src="assets/js/layout.js"></script>
+  <script type="module" src="assets/js/movimenti.js"></script>
+</body>
+</html>
