@@ -1,5 +1,6 @@
 import { REGIONI, regioneDelNervo } from "./data/regioni.js";
 import { FONTI } from "./data/fonti.js";
+import { RIFLESSI } from "./data/riflessi.js";
 import { coloreNervo } from "./colori.js";
 
 const $ = (sel) => document.querySelector(sel);
@@ -57,6 +58,15 @@ function disegnaPlesso() {
   $("#plesso").innerHTML = `<svg viewBox="0 0 760 ${PLESSO.altezza}" role="img" aria-label="Schema del ${esc(PLESSO.nome.toLowerCase())}">${archi}${nodiSvg}${colonne}</svg>`;
 }
 
+// Riflessi il cui arco passa per il nervo
+function riflessiDelNervo(id) {
+  const lista = RIFLESSI.filter((r) => r.nervi.includes(id));
+  if (!lista.length) return "";
+  return `<h3>Riflessi</h3><ul>${lista
+    .map((r) => `<li><a href="riflessi.html#${r.id}">${esc(r.nome)}</a> — ${esc(r.radici)}${r.categoria === "patologico" ? " <span class=\"piccolo\">(patologico)</span>" : ""}</li>`)
+    .join("")}</ul>`;
+}
+
 // --- Scheda del nervo
 function disegnaScheda(id) {
   const { nervoPerId, muscoliDelNervo, MUSCOLI } = regione;
@@ -91,6 +101,7 @@ function disegnaScheda(id) {
         <div>${esc(l.note)}</div></div>`
       )
       .join("")}
+    ${riflessiDelNervo(id)}
     ${n.perle.length ? `<h3>Punti chiave</h3>${lista(n.perle)}` : ""}
     <p><a class="btn" href="movimenti.html#nervo=${id}">Apri nel modello 3D →</a></p>
     <p class="fonti-voce">Fonti: ${n.fonti.map((f) => esc(FONTI[f]?.breve || f)).join("; ")}</p>`;

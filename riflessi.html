@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Riflessi · SNP</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-pagina="riflessi.html">
+  <div id="testata"></div>
+  <main>
+    <h1>Riflessi</h1>
+    <p class="sottotitolo">Riflessi osteotendinei e superficiali normali, riflessi patologici e loro interpretazione nella diagnosi di lesioni del sistema nervoso periferico e centrale.</p>
+
+    <div class="schede-tab" id="filtri" style="max-width:760px;flex-wrap:wrap" aria-label="Filtra per categoria"></div>
+    <div class="griglia-riflessi" id="elenco-riflessi"></div>
+
+    <section class="scheda" style="margin-top:24px" id="scala">
+      <h2 style="margin-top:0">Graduazione dei riflessi osteotendinei: scala NINDS</h2>
+      <table><thead><tr><th style="width:70px">Grado</th><th>Descrizione</th></tr></thead><tbody id="scala-ninds"></tbody></table>
+      <p class="piccolo">Il riflesso va sempre confrontato con il controlaterale e con gli altri livelli: l'asimmetria e il gradiente (es. riflessi distali ridotti rispetto ai prossimali) contano più del valore assoluto.
+        Se un riflesso sembra assente, ripeterlo con la <strong>manovra di Jendrassik</strong> (il paziente aggancia le mani e tira al momento della percussione) o stringendo i denti.
+        Fonti: <span id="fonti-scala"></span>.</p>
+    </section>
+
+    <section class="scheda" style="margin-top:16px" id="interpretazione">
+      <h2 style="margin-top:0">Interpretazione</h2>
+      <div class="tabella-scorri"><table>
+        <thead><tr><th>Quadro</th><th>Riflessi</th><th>Note</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Radicolopatia</strong></td><td>Riduzione del riflesso del livello colpito: C5–C6 bicipitale e brachioradiale; C7 tricipitale; C8 flessori delle dita; L3–L4 rotuleo (e adduttori); L5 ischiocrurali mediali; S1 achilleo.</td><td>Si associano deficit di forza nel miotomo e disturbi sensitivi nel dermatomo.</td></tr>
+          <tr><td><strong>Lesione di plesso o di nervo</strong></td><td>Riduzione dei riflessi il cui arco passa per il nervo leso.</td><td>Esempi: rotuleo ridotto nella lesione del femorale con adduttori normali; tricipitale conservato nella lesione del radiale al solco spirale; achilleo normale nella lesione del peroneo. La simulazione delle lesioni in <a href="movimenti.html">Movimenti 3D</a> mostra anche i riflessi coinvolti.</td></tr>
+          <tr><td><strong>Polineuropatia lunghezza-dipendente</strong></td><td>Achilleo ridotto o assente per primo, poi rotuleo; arti superiori più tardi.</td><td>L'areflessia achillea isolata può essere normale negli anziani.</td></tr>
+          <tr><td><strong>Sindrome di Guillain-Barré</strong></td><td>Riflessi ridotti o assenti negli arti deboli nella maggior parte dei pazienti.</td><td>Riflessi normali o vivaci non escludono la diagnosi, soprattutto nelle varianti motorie assonali (linea guida EAN/PNS 2023).</td></tr>
+          <tr><td><strong>Sindrome miastenica di Lambert-Eaton</strong></td><td>Ridotti o assenti a riposo, con aumento dopo una breve contrazione volontaria massimale del muscolo (facilitazione post-esercizio).</td><td>Correlato clinico dell'incremento del CMAP dopo esercizio all'ENG.</td></tr>
+          <tr><td><strong>Miopatie</strong></td><td>Conservati a lungo, ridotti solo con debolezza marcata.</td><td>Utile per distinguerle dalle neuropatie.</td></tr>
+          <tr><td><strong>Lesione del primo motoneurone</strong></td><td>Iperreflessia, clono, diffusione (es. adduttori crociato), segni di Babinski e Hoffmann; superficiali addominali ridotti.</td><td>Nella fase acuta (shock spinale) i riflessi possono essere assenti.</td></tr>
+          <tr><td><strong>Malattia del motoneurone (SLA)</strong></td><td>Riflessi vivaci in muscoli ipotrofici e fascicolanti.</td><td>La combinazione di segni di primo e secondo motoneurone nello stesso distretto è caratteristica.</td></tr>
+          <tr><td><strong>Mielopatia cervicale</strong></td><td>Riflessi ridotti al livello della lesione e aumentati sotto (inversione del riflesso stiloradiale), Hoffmann, Babinski.</td><td></td></tr>
+          <tr><td><strong>Ipotiroidismo</strong></td><td>Fase di rilasciamento rallentata (soprattutto all'achilleo).</td><td></td></tr>
+          <tr><td><strong>Sindrome cerebellare</strong></td><td>Riflessi 'pendolari' (oscillazioni ripetute dopo la percussione).</td><td></td></tr>
+        </tbody>
+      </table></div>
+      <p class="fonti-voce">Fonti: <span id="fonti-interpretazione"></span>.</p>
+    </section>
+  </main>
+  <div id="pie"></div>
+  <script src="assets/js/layout.js"></script>
+  <script type="module" src="assets/js/riflessi.js"></script>
+</body>
+</html>

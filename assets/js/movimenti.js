@@ -1,6 +1,7 @@
 import { Visualizzatore } from "./viewer3d.js";
 import { REGIONI, regioneDelNervo, effettoLesione } from "./data/regioni.js";
 import { coloreNervo } from "./colori.js";
+import { RIFLESSI, riflessoColpito, segnoNonEvocabile } from "./data/riflessi.js";
 
 const $ = (sel) => document.querySelector(sel);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
@@ -185,7 +186,32 @@ function disegnaLesioni() {
       colpiti.length
         ? colpiti.map(([m, e]) => `<button class="voce-mov${stato.movimento?.id === m.id ? " attivo" : ""}" data-mov="${m.id}">${esc(m.nome)}<span class="badge ${e}">${ETICHETTE[e]}</span></button>`).join("")
         : `<p class="piccolo">Nessun deficit motorio: lesione puramente sensitiva.</p>`
-    }`;
+    }
+    ${riflessiLesione(lesi)}`;
+}
+
+// Riflessi il cui arco passa per i muscoli denervati; i riflessi patologici che dipendono
+// da quei muscoli (es. Babinski con estensore dell'alluce paralizzato) non sono evocabili.
+function riflessiLesione(lesi) {
+  const voci = RIFLESSI.filter((r) => muscoloPerId[r.muscoli[0]]).flatMap((r) => {
+    if (riflessoColpito(r, lesi)) return [`<a class="voce-mov" href="riflessi.html#${r.id}">${esc(r.nome)}<span class="badge perso">ridotto/assente</span></a>`];
+    if (segnoNonEvocabile(r, lesi)) return [`<a class="voce-mov" href="riflessi.html#${r.id}">${esc(r.nome)}<span class="badge lieve">non evocabile</span></a>`];
+    return [];
+  });
+  return voci.length ? `<div class="piccolo" style="margin:12px 0 4px">Riflessi</div>${voci.join("")}` : "";
+}
+
+// Riflessi che si osservano con questo movimento (risposta riflessa o arco condiviso)
+function riflessiMovimento(mv, lesi) {
+  const lista = RIFLESSI.filter((r) => r.movimento === mv.id);
+  if (!lista.length) return "";
+  return `<h4 style="margin:14px 0 4px">Riflessi correlati</h4><ul class="piccolo" style="padding-left:18px;margin:0">${lista
+    .map((r) => {
+      const livello = r.categoria === "patologico" ? "patologico" : r.radici;
+      const leso = lesi.length && riflessoColpito(r, lesi) ? ' — <strong style="color:var(--perso)">ridotto/assente con questa lesione</strong>' : "";
+      return `<li><a href="riflessi.html#${r.id}">${esc(r.nome)}</a> (${esc(livello)})${leso}</li>`;
+    })
+    .join("")}</ul>`;
 }
 
 // --- Pannello destro: informazioni
@@ -205,7 +231,8 @@ function aggiornaInfo() {
           return `<tr style="${lesi.includes(id) ? "color:var(--perso)" : ""}"><td><a href="#" data-muscolo="${id}">${esc(m.nome)}</a>${ruolo === "accessorio" ? ' <span class="piccolo">(accessorio)</span>' : ""}</td>
             <td>${m.nervi.map(chipNervo).join("")}<div class="piccolo">${m.ramo ? `${esc(m.ramo)} · ` : ""}${esc(m.radici)}</div></td></tr>`;
         })
-        .join("")}</tbody></table>`;
+        .join("")}</tbody></table>
+      ${riflessiMovimento(mv, lesi)}`;
   } else {
     html += `<h3 style="margin-top:0">Come si usa</h3>
       <ul class="piccolo" style="padding-left:18px">

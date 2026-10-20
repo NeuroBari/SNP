@@ -184,3 +184,10 @@ button.btn.attivo, a.btn.attivo { background: var(--accento); color: #fff; borde
 td .chip { white-space: normal; }
 [hidden] { display: none !important; }
 .legenda-3d a { color: var(--accento); }
+.griglia-larga { grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); }
+.riflesso dl.scheda-nervo { grid-template-columns: 100px 1fr; font-size: 0.92rem; }
+.etichetta.patologico { background: #f6dede; color: var(--perso); }
+a.chip { text-decoration: none; color: inherit; }
+@media (max-width: 800px) { .griglia-larga { grid-template-columns: 1fr; } }
+a.voce-mov { text-decoration: none; }
+.riflesso { scroll-margin-top: 72px; }

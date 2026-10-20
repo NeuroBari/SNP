@@ -6,6 +6,7 @@ anatomia, movimenti in 3D, patologia ed ENG/EMG.
 ## Sezioni
 - **Anatomia** (`anatomia.html`): plessi brachiale e lombosacrale interattivi, schede dei nervi (origine, decorso, rami, muscoli con radici, territorio sensitivo, siti di lesione).
 - **Movimenti 3D** (`movimenti.html`): modelli dell'arto superiore e inferiore che eseguono i movimenti, evidenzia i muscoli per nervo e simula le lesioni.
+- **Riflessi** (`riflessi.html`): osteotendinei, superficiali e patologici, scala NINDS, interpretazione; collegati alle schede dei nervi, al 3D e alla simulazione delle lesioni.
 - **Patologia**, **ENG/EMG**: in preparazione.
 - **Fonti** (`fonti.html`): bibliografia e stato di revisione.
 

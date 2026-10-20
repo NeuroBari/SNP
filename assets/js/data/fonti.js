@@ -30,4 +30,27 @@ export const FONTI = {
     completa: "Stewart JD. Focal Peripheral Neuropathies. 4th ed. JBJ Publishing; 2010.",
     nota: "Neuropatie focali e sindromi da intrappolamento.",
   },
+  campbell8: {
+    breve: "DeJong's (8ª ed.)",
+    completa: "Campbell WW, Barohn RJ. DeJong's The Neurologic Examination. 8th ed. Wolters Kluwer; 2019.",
+    nota: "Tecnica di evocazione e interpretazione dei riflessi osteotendinei, superficiali e patologici.",
+  },
+  hallett1993: {
+    breve: "Hallett (1993)",
+    completa: "Hallett M. NINDS myotatic reflex scale. Neurology. 1993;43(12):2723. doi:10.1212/wnl.43.12.2723",
+    nota: "Scala di graduazione dei riflessi osteotendinei (0–4).",
+    url: "https://doi.org/10.1212/wnl.43.12.2723",
+  },
+  litvan1996: {
+    breve: "Litvan et al. (1996)",
+    completa: "Litvan I, Mangone CA, Werden W, et al. Reliability of the NINDS Myotatic Reflex Scale. Neurology. 1996;47(4):969-972. doi:10.1212/wnl.47.4.969",
+    nota: "Affidabilità intra- e interosservatore della scala NINDS.",
+    url: "https://doi.org/10.1212/wnl.47.4.969",
+  },
+  eanpnsGbs2023: {
+    breve: "EAN/PNS GBS (2023)",
+    completa: "van Doorn PA, Van den Bergh PYK, Hadden RDM, et al. European Academy of Neurology/Peripheral Nerve Society Guideline on diagnosis and treatment of Guillain-Barré syndrome. Eur J Neurol. 2023;30(12):3646-3674. doi:10.1111/ene.16073",
+    nota: "Linea guida europea sulla sindrome di Guillain-Barré.",
+    url: "https://doi.org/10.1111/ene.16073",
+  },
 };
