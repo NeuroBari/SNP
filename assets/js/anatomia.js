@@ -2,6 +2,8 @@ import { REGIONI, regioneDelNervo } from "./data/regioni.js";
 import { FONTI } from "./data/fonti.js";
 import { RIFLESSI } from "./data/riflessi.js";
 import { coloreNervo } from "./colori.js";
+import { territoriDelNervo } from "./data/sensibilita.js";
+import { svgArea } from "./mappa-sensitiva.js";
 
 const $ = (sel) => document.querySelector(sel);
 let regione = REGIONI.superiore;
@@ -67,6 +69,14 @@ function riflessiDelNervo(id) {
     .join("")}</ul>`;
 }
 
+// Mappa del territorio cutaneo del nervo, con link al confronto con i dermatomi
+function mappaSensitiva(id) {
+  const territori = territoriDelNervo(id);
+  if (!territori.length) return "";
+  return `<div class="mappe-mini">${svgArea(regione.id, { territori }, { modo: "territori" })}</div>
+    <a class="piccolo" href="sensibilita.html#nervo=${id}">Rami cutanei e confronto con i dermatomi →</a>`;
+}
+
 // --- Scheda del nervo
 function disegnaScheda(id) {
   const { nervoPerId, muscoliDelNervo, MUSCOLI } = regione;
@@ -81,7 +91,7 @@ function disegnaScheda(id) {
       <dt>Origine</dt><dd>${esc(n.origine)}</dd>
       <dt>Decorso</dt><dd>${esc(n.decorso)}</dd>
       <dt>Rami</dt><dd>${lista(n.rami)}</dd>
-      <dt>Territorio sensitivo</dt><dd>${esc(n.sensitivo)}</dd>
+      <dt>Territorio sensitivo</dt><dd>${esc(n.sensitivo)}${mappaSensitiva(id)}</dd>
     </dl>
     <h3>Muscoli innervati</h3>
     <div class="tabella-scorri"><table>

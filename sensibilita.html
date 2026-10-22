@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sensibilità · SNP</title>
+  <meta name="description" content="Dermatomi e territori dei nervi cutanei degli arti: confronto tra radicolopatie e lesioni di nervo.">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-pagina="sensibilita.html">
+  <div id="testata"></div>
+  <main>
+    <h1 id="titolo">Sensibilità</h1>
+    <div class="schede-tab" id="scelta-regione" style="max-width:420px" aria-label="Regione"></div>
+    <p class="sottotitolo">Dermatomi e territori dei nervi cutanei a confronto: scegli una radice o un nervo, o clicca un'area sulla mappa.</p>
+
+    <div class="layout-sens">
+      <aside class="scheda elenco-sens" id="elenco" aria-label="Radici e nervi"></aside>
+      <div>
+        <section class="scheda" id="sezione-mappe">
+          <div class="riga-comandi" id="modi" role="tablist" aria-label="Mappa">
+            <button class="btn" data-modo="dermatomi" role="tab">Dermatomi</button>
+            <button class="btn" data-modo="territori" role="tab">Nervi cutanei</button>
+            <button class="btn" data-modo="sovrapposizione" role="tab">Sovrapposizione</button>
+            <button class="btn" id="azzera" style="margin-left:auto">Azzera selezione</button>
+          </div>
+          <div class="mappe-sens" id="mappe"></div>
+          <div class="legenda-sens" id="legenda"></div>
+        </section>
+
+        <section class="scheda" id="info" style="margin-top:16px" aria-live="polite"></section>
+
+        <section class="scheda" style="margin-top:16px">
+          <h3>Radice o nervo? Confronti guidati</h3>
+          <p>Quadri sensitivi che si somigliano: il pulsante mostra sulle mappe il dermatomo (tratteggio) e il territorio del nervo (campitura).</p>
+          <div id="confronti"></div>
+        </section>
+
+        <div class="avviso" style="margin-top:16px">
+          Le mappe sono schematiche. I dermatomi si sovrappongono ampiamente e le mappe pubblicate (Foerster, Keegan e Garrett, Lee e coll.) differiscono tra loro;
+          anche i territori cutanei variano tra individui. Per l'esame conviene saggiare le aree più costanti: i punti chiave degli standard ISNCSCI
+          (pallini neri) per i dermatomi e le zone autonome per i nervi (es. polpastrello dell'indice per il mediano, del mignolo per l'ulnare, primo spazio dorsale per il radiale superficiale e il peroneo profondo).
+          <span class="piccolo">Fonti: Lee et al. (2008); ISNCSCI (2019); Gray's (42ª ed.); Aids (2023); Russell (2015); Stewart (2010).</span>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="pie"></div>
+  <script src="assets/js/layout.js"></script>
+  <script type="module" src="assets/js/sensibilita.js"></script>
+</body>
+</html>

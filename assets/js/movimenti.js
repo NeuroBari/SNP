@@ -3,6 +3,8 @@ import { REGIONI, regioneDelNervo, effettoLesione } from "./data/regioni.js";
 import { coloreNervo } from "./colori.js";
 import { RIFLESSI, riflessoColpito, segnoNonEvocabile } from "./data/riflessi.js";
 import { radiciDi } from "./data/lesioni-prossimali.js";
+import { areaSensitiva } from "./data/sensibilita.js";
+import { svgArea } from "./mappa-sensitiva.js";
 
 const $ = (sel) => document.querySelector(sel);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
@@ -206,7 +208,21 @@ function disegnaLesioni() {
         ? colpiti.map(([m, e]) => `<button class="voce-mov${stato.movimento?.id === m.id ? " attivo" : ""}" data-mov="${m.id}">${esc(m.nome)}<span class="badge ${e}">${ETICHETTE[e]}</span></button>`).join("")
         : `<p class="piccolo">Nessun deficit motorio: lesione puramente sensitiva.</p>`
     }
-    ${riflessiLesione(lesione)}`;
+    ${riflessiLesione(lesione)}
+    ${sensibilitaLesione(lesione)}`;
+}
+
+// Area di ipoestesia attesa (territori cutanei per nervi e corde, dermatomi per radici e tronchi)
+function sensibilitaLesione(lesione) {
+  const area = areaSensitiva(stato.nervo, lesione.id, lesione);
+  const titolo = `<div class="piccolo" style="margin:12px 0 4px">Sensibilità${area.dermatomi.length ? ` (dermatom${area.dermatomi.length > 1 ? "i" : "o"} ${area.dermatomi.join(", ")})` : ""}</div>`;
+  if (!area.territori.length && !area.dermatomi.length) return `${titolo}<p class="piccolo">${esc(area.nota)}</p>`;
+  const p = new URLSearchParams({ regione: regione.id });
+  if (area.dermatomi.length) p.set("derm", area.dermatomi.join(","));
+  else p.set("terr", area.territori.join(","));
+  return `${titolo}<div class="mappe-mini">${svgArea(regione.id, area)}</div>
+    ${area.nota ? `<p class="piccolo">${esc(area.nota)}</p>` : ""}
+    <a class="piccolo" href="sensibilita.html#${p}">Apri nella pagina Sensibilità →</a>`;
 }
 
 // Riflessi il cui arco passa per i muscoli denervati (per le radici: riflessi del livello leso);

@@ -71,4 +71,16 @@ export const FONTI = {
     nota: "Corneomandibolare circa 2,5 volte più frequente nel parkinsonismo rispetto ai controlli di pari età.",
     url: "https://doi.org/10.1212/wnl.30.2.189",
   },
+  lee2008: {
+    breve: "Lee et al. (2008)",
+    completa: "Lee MWL, McPhee RW, Stringer MD. An evidence-based approach to human dermatomes. Clin Anat. 2008;21(5):363-373. doi:10.1002/ca.20636",
+    nota: "Revisione sistematica degli studi sui dermatomi e mappa basata sulle evidenze; sottolinea sovrapposizione e variabilità.",
+    url: "https://doi.org/10.1002/ca.20636",
+  },
+  isncsci2019: {
+    breve: "ISNCSCI (2019)",
+    completa: "Rupp R, Biering-Sørensen F, Burns SP, et al. International Standards for Neurological Classification of Spinal Cord Injury: Revised 2019. Top Spinal Cord Inj Rehabil. 2021;27(2):1-22. doi:10.46292/sci2702-1",
+    nota: "Punti sensitivi chiave dei dermatomi usati nelle mappe della pagina Sensibilità.",
+    url: "https://doi.org/10.46292/sci2702-1",
+  },
 };

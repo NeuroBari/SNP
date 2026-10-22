@@ -40,7 +40,7 @@ function muscoliColpiti(muscoli, { radici, soglia = 0.5, soloNervi, esclusi = []
   return { muscoli: grave, lievi: lieve };
 }
 
-const NOTE_RADICI = {
+export const NOTE_RADICI = {
   C5: "Debolezza di abduzione ed extrarotazione della spalla e di flessione del gomito; riflesso bicipitale ridotto; ipoestesia della faccia laterale del braccio. I romboidi (n. dorsale scapolare) sono coinvolti: li distingue da una lesione del tronco superiore.",
   C6: "Debolezza di flessione del gomito (bicipite, brachioradiale) ed estensione del polso; riflessi bicipitale e brachioradiale ridotti; parestesie a pollice e indice e sulla faccia laterale dell'avambraccio.",
   C7: "La radicolopatia cervicale più frequente: debolezza di tricipite, estensori di polso e dita, flessore radiale del carpo e pronatore rotondo; riflesso tricipitale ridotto; parestesie al dito medio.",

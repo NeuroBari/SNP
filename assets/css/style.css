@@ -12,6 +12,8 @@
   --conservato: #3c9d5d;
   --ombra: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 14px rgba(0, 0, 0, 0.05);
   --raggio: 10px;
+  --pelle: #f6ece4;
+  --pelle-bordo: #bfa58f;
   --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
@@ -24,6 +26,8 @@
     --accento: #5bb3d1;
     --accento-2: #1d3640;
     --ombra: none;
+    --pelle: #3a332e;
+    --pelle-bordo: #8c7a6b;
   }
 }
 
@@ -208,3 +212,43 @@ a.voce-mov { text-decoration: none; }
 .esito-titolo { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
 .esito ul { margin: 6px 0; padding-left: 18px; }
 @media (max-width: 1000px) { .layout-esame { grid-template-columns: 1fr; } }
+
+/* Sensibilità: mappe di dermatomi e territori cutanei */
+.layout-sens { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 24px; align-items: start; }
+.layout-sens > * { min-width: 0; }
+.elenco-sens { position: sticky; top: 76px; max-height: calc(100vh - 92px); overflow-y: auto; }
+.elenco-sens h4 { margin: 14px 0 6px; font-size: 0.78rem; text-transform: uppercase; color: var(--testo-2); letter-spacing: 0.05em; }
+.elenco-sens .radici { display: flex; flex-wrap: wrap; gap: 4px; }
+.elenco-sens .radici button { min-width: 44px; }
+.elenco-sens .voce { display: block; width: 100%; text-align: left; border: 0; background: none; color: var(--testo); font: inherit; font-size: 0.9rem; padding: 4px 8px; border-radius: 6px; cursor: pointer; }
+.elenco-sens .voce:hover { background: var(--accento-2); }
+.elenco-sens .voce.attivo { background: var(--accento-2); font-weight: 600; }
+.elenco-sens .voce.ramo { padding-left: 26px; font-size: 0.82rem; color: var(--testo-2); }
+.elenco-sens .voce.ramo.attivo { color: var(--testo); }
+.mappe-sens { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.vista-sens { margin: 0; flex: 1 1 200px; min-width: 0; text-align: center; }
+.vista-sens svg { width: 100%; height: auto; display: block; max-height: 74vh; }
+.vista-sens figcaption { font-size: 0.82rem; color: var(--testo-2); }
+.vista-sens .contorno path { fill: none; stroke: var(--pelle-bordo); stroke-width: 3; }
+.vista-sens .pelle { fill: var(--pelle); stroke: none; }
+.vista-sens .pelle.bordata { stroke: var(--pelle-bordo); stroke-width: 1.2; }
+.vista-sens .zona { stroke: var(--bg-2); stroke-width: 0.8; cursor: pointer; }
+.vista-sens .zona:hover { stroke: var(--testo); stroke-width: 1.6; }
+.vista-sens .bordo-derm { fill: none; pointer-events: stroke; stroke: var(--testo); stroke-width: 0.9; stroke-dasharray: 4 3; opacity: 0.55; cursor: pointer; }
+.vista-sens .bordo-zona { fill: none; stroke: var(--pelle-bordo); stroke-width: 0.6; opacity: 0.7; }
+.vista-sens .etichetta-derm { font-size: 12px; font-weight: 700; text-anchor: middle; fill: #1e2328; paint-order: stroke; stroke: rgba(255,255,255,0.75); stroke-width: 3px; pointer-events: none; }
+.vista-sens .punto-chiave { fill: #1e2328; stroke: #fff; stroke-width: 1.4; }
+.vista-sens .nota-mappa { font-size: 11px; fill: var(--testo-2); }
+.vista-sens.mini { flex-grow: 0; }
+.vista-sens.mini svg { max-height: 240px; }
+.vista-sens.mini .zona { cursor: default; }
+.mappe-mini { display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-end; margin: 6px 0; }
+.legenda-sens { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 0.82rem; color: var(--testo-2); margin-top: 8px; }
+.legenda-sens .tratteggio { display: inline-block; width: 14px; height: 10px; margin-right: 4px; vertical-align: -1px; background: repeating-linear-gradient(45deg, var(--testo-2) 0 2px, transparent 2px 5px); }
+.confronto table td:first-child { font-weight: 600; white-space: nowrap; }
+.confronto { border-top: 1px solid var(--bordo); padding-top: 10px; margin-top: 12px; }
+.confronto:first-of-type { border-top: 0; margin-top: 0; }
+@media (max-width: 900px) {
+  .layout-sens { grid-template-columns: 1fr; }
+  .elenco-sens { position: static; max-height: none; order: 2; }
+}
