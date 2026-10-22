@@ -453,3 +453,39 @@ export const PLESSO = {
     ["tibiale", "surale"], ["peroneo", "surale"],
   ],
 };
+
+// Atteggiamenti tipici delle lesioni (pose statiche nel modello 3D)
+export const ATTEGGIAMENTI = [
+  { id: "piede-cadente", nome: "Piede cadente (peroneo alla testa della fibula)", lesione: { sorgente: "peroneo", sito: "testa-fibula" }, vista: "oscillante",
+    posa: { anca: { r: [-35, 0, 0] }, ginocchio: { r: [55, 0, 0] }, caviglia: { r: [35, 0, 12] }, dita_mtf: { r: [15, 0, 0] }, alluce_mtf: { r: [10, 0, 0] } },
+    descrizione: "Nella fase oscillante del passo il piede cade in flessione plantare con lieve inversione; il paziente compensa flettendo di più anca e ginocchio (andatura steppante).",
+    nota: "Inversione (tibiale posteriore) e abduzione dell'anca (medio gluteo) normali: lo distinguono dalla radicolopatia L5." },
+  { id: "piede-talo", nome: "Piede talo e dita ad artiglio (tibiale)", lesione: { sorgente: "tibiale", sito: "popliteo" }, vista: "piede",
+    posa: { caviglia: { r: [-15, 0, -8] }, dita_mtf: { r: [-20, 0, 0] }, dita_if: { r: [40, 0, 0] }, alluce_mtf: { r: [-15, 0, 0] }, alluce_if: { r: [30, 0, 0] } },
+    descrizione: "Prevalgono i dorsiflessori e gli evertori (peroneo) sui flessori plantari paralizzati: piede in dorsiflessione e lieve eversione; la paralisi dei muscoli intrinseci del piede produce dita ad artiglio.",
+    nota: "Impossibile camminare sulle punte; riflesso achilleo ridotto o assente." },
+];
+
+// Muscoli chiave dell'esame obiettivo, con le radici prevalenti (miotomi) usate per la localizzazione
+export const MUSCOLI_CHIAVE = [
+  { id: "ileopsoas", movimento: "Flessione dell'anca", radici: ["L2", "L3"] },
+  { id: "adduttore-lungo", movimento: "Adduzione dell'anca", radici: ["L2", "L3"] },
+  { id: "quadricipite", movimento: "Estensione del ginocchio", radici: ["L3", "L4"] },
+  { id: "gluteo-medio", movimento: "Abduzione dell'anca", radici: ["L5"] },
+  { id: "grande-gluteo", movimento: "Estensione dell'anca", radici: ["S1"] },
+  { id: "bicipite-femorale-lungo", movimento: "Flessione del ginocchio (ischiocrurali)", radici: ["L5", "S1"] },
+  { id: "tibiale-anteriore", movimento: "Dorsiflessione della caviglia", radici: ["L4", "L5"] },
+  { id: "ehl", movimento: "Estensione dell'alluce", radici: ["L5"] },
+  { id: "peroneo-lungo", movimento: "Eversione del piede", radici: ["L5", "S1"] },
+  { id: "tibiale-posteriore", movimento: "Inversione del piede", radici: ["L5"] },
+  { id: "gastrocnemio", movimento: "Flessione plantare", radici: ["S1"] },
+  { id: "abduttore-alluce", movimento: "Abduzione dell'alluce", radici: ["S1", "S2"] },
+];
+
+// Esempi per la scheda d'esame: gradi MRC dei muscoli non normali
+export const ESEMPI_ESAME = [
+  { nome: "Piede cadente", mrc: { "tibiale-anteriore": 2, ehl: 1, "peroneo-lungo": 3 } },
+  { nome: "Radicolopatia L5", mrc: { "gluteo-medio": 4, "tibiale-anteriore": 4, ehl: 3, "peroneo-lungo": 4, "tibiale-posteriore": 4 } },
+  { nome: "Radicolopatia S1", mrc: { gastrocnemio: 4, "grande-gluteo": 4 } },
+  { nome: "Lesione del femorale", mrc: { quadricipite: 2 } },
+];

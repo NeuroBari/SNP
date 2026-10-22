@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Esame obiettivo · SNP</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-pagina="esame.html">
+  <div id="testata"></div>
+  <main>
+    <h1 id="titolo">Esame obiettivo</h1>
+    <div class="schede-tab" id="scelta-regione" style="max-width:420px" aria-label="Regione"></div>
+    <p class="sottotitolo">Muscoli chiave per l'esame della forza: ciascuno rappresenta una radice e un nervo. Inserisci il grado MRC (un lato alla volta): il sito confronta il quadro con tutte le sedi di lesione e propone quelle compatibili.</p>
+
+    <div class="layout-esame">
+      <section class="scheda">
+        <div class="riga-comandi">
+          <span class="piccolo">Esempi:</span>
+          <span id="esempi"></span>
+          <button class="btn" id="azzera">Tutti normali (5)</button>
+        </div>
+        <div class="tabella-scorri">
+          <table class="tabella-esame">
+            <thead><tr><th>Movimento</th><th>Muscolo</th><th>Nervo</th><th>Radice</th><th>MRC</th></tr></thead>
+            <tbody id="righe"></tbody>
+          </table>
+        </div>
+        <p class="piccolo"><strong>Scala MRC:</strong> 0 nessuna contrazione · 1 contrazione visibile o palpabile senza movimento · 2 movimento a gravità eliminata · 3 movimento contro gravità · 4 movimento contro gravità e resistenza (deficit) · 5 forza normale.
+          Clic sul nome del muscolo per la tecnica del test.</p>
+      </section>
+
+      <section class="scheda" id="risultati" aria-live="polite"></section>
+    </div>
+
+    <section class="scheda" style="margin-top:16px">
+      <h3 style="margin-top:0">Come funziona</h3>
+      <ul class="piccolo" style="padding-left:18px;margin:0">
+        <li>Per ogni sede di lesione presente nel sito (nervi periferici, tronchi e corde del plesso brachiale, plesso lombosacrale, radici) si confrontano i muscoli deboli e quelli normali con i muscoli che quella lesione dovrebbe colpire.</li>
+        <li><strong>Compatibile</strong>: spiega tutti i muscoli deboli e nessun muscolo che dovrebbe essere debole è normale. <strong>Parziale</strong>: alcuni muscoli deboli non sono spiegati. <strong>Poco compatibile</strong>: un muscolo che dovrebbe essere debole è normale.</li>
+        <li>Per le radici si usano i miotomi prevalenti indicati in tabella: poiché i muscoli ricevono fibre da più radici, nelle radicolopatie il deficit è spesso parziale.</li>
+        <li>È un esercizio didattico basato sui dati del sito: non sostituisce il ragionamento clinico, l'esame della sensibilità e dei riflessi e l'elettrodiagnostica.</li>
+      </ul>
+      <p class="fonti-voce">Scala MRC e muscoli chiave: Aids to the Examination of the Peripheral Nervous System (2023).</p>
+    </section>
+  </main>
+  <div id="pie"></div>
+  <script src="assets/js/layout.js"></script>
+  <script type="module" src="assets/js/esame.js"></script>
+</body>
+</html>

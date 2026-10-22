@@ -530,3 +530,64 @@ export const PLESSO = {
     ["CL", "pettorali"], ["CM", "pettorali"], ["CP", "sottoscapolari"], ["CP", "toracodorsale"],
   ],
 };
+
+// Atteggiamenti tipici delle lesioni (pose statiche nel modello 3D)
+// `lesione`: sorgente (nervo o gruppo di lesioni prossimali) e sede, usate per colorare i muscoli.
+const DITA_ARTIGLIO = (dita) => Object.fromEntries(dita.flatMap((d) => [[`dito${d}_mcf`, { r: [25, 0, 0] }], [`dito${d}_ifp`, { r: [-70, 0, 0] }], [`dito${d}_ifd`, { r: [-45, 0, 0] }]]));
+export const ATTEGGIAMENTI = [
+  { id: "artiglio-ulnare", nome: "Mano ad artiglio (ulnare)", lesione: { sorgente: "ulnare", sito: "guyon" }, vista: "mano",
+    posa: { ...DITA_ARTIGLIO([4, 5]), dito5_mcf: { r: [30, 0, 12] }, dito3_ifp: { r: [-15, 0, 0] } },
+    descrizione: "Iperestensione delle metacarpofalangee e flessione delle interfalangee di anulare e mignolo, per paralisi degli interossei e dei lombricali III–IV con estensori e flessori lunghi conservati. Mignolo abdotto (segno di Wartenberg).",
+    nota: "Paradosso ulnare: l'artiglio è più marcato nelle lesioni distali (canale di Guyon) perché il flessore profondo delle dita ulnare è risparmiato." },
+  { id: "benedicente", nome: "Mano benedicente (mediano prossimale)", lesione: { sorgente: "mediano", sito: "gomito" }, vista: "manoAlta",
+    posa: { gomito: { r: [-115, 0, 0] }, dito4_mcf: { r: [-80, 0, 0] }, dito4_ifp: { r: [-95, 0, 0] }, dito4_ifd: { r: [-60, 0, 0] }, dito5_mcf: { r: [-80, 0, 0] }, dito5_ifp: { r: [-95, 0, 0] }, dito5_ifd: { r: [-60, 0, 0] }, dito3_mcf: { r: [-35, 0, 0] }, dito3_ifp: { r: [-35, 0, 0] }, pollice_cmc: { r: [0, 0, -10] } },
+    descrizione: "Al tentativo di chiudere il pugno restano estesi pollice e indice e il medio si flette solo in parte: sono paralizzati i flessori superficiali e profondi (indice, medio) e il flessore lungo del pollice; anulare e mignolo si flettono grazie al flessore profondo ulnare.",
+    nota: "Da non confondere con la mano ad artiglio ulnare, che è un atteggiamento a riposo." },
+  { id: "scimmiesca", nome: "Mano scimmiesca (mediano al carpo)", lesione: { sorgente: "mediano", sito: "tunnel-carpale" }, vista: "mano",
+    posa: { pollice_cmc: { r: [15, 0, 18] }, pollice_mcf: { r: [0, 0, 5] } },
+    descrizione: "Pollice addotto ed esteso sul piano del palmo, accanto all'indice, per paralisi di abduttore breve e opponente del pollice; nelle lesioni croniche si associa l'ipotrofia dell'eminenza tenar.",
+    nota: "Il pollice non può essere portato perpendicolare al palmo né opposto al mignolo." },
+  { id: "polso-cadente", nome: "Polso cadente (radiale al solco spirale)", lesione: { sorgente: "radiale", sito: "solco-spirale" }, vista: "avanti",
+    posa: { spalla: { r: [-80, 0, 0] }, avambraccio: { r: [0, 150, 0] }, polso: { r: [-65, 0, 0] }, ...Object.fromEntries([2, 3, 4, 5].flatMap((d) => [[`dito${d}_mcf`, { r: [-35, 0, 0] }], [`dito${d}_ifp`, { r: [-25, 0, 0] }]])) },
+    descrizione: "Con il braccio teso in avanti e la mano prona, polso e dita cadono in flessione per paralisi degli estensori. Il tricipite è risparmiato perché i suoi rami originano sopra il solco spirale.",
+    nota: "Testare la forza degli interossei a polso esteso passivamente: a polso flesso sembrano falsamente deboli." },
+  { id: "dita-cadenti", nome: "Dita cadenti (n. interosseo posteriore)", lesione: { sorgente: "radiale", sito: "pin" }, vista: "avanti",
+    posa: { spalla: { r: [-80, 0, 0] }, avambraccio: { r: [0, 150, 0] }, polso: { r: [25, 0, -12] }, ...Object.fromEntries([2, 3, 4, 5].flatMap((d) => [[`dito${d}_mcf`, { r: [-65, 0, 0] }], [`dito${d}_ifp`, { r: [-15, 0, 0] }]])) },
+    descrizione: "Le dita cadono alle metacarpofalangee, ma il polso si estende, con deviazione radiale: l'estensore radiale lungo del carpo è risparmiato, l'estensore ulnare del carpo no. Nessun deficit sensitivo.",
+    nota: "Il brachioradiale è normale: lesione distale al gomito." },
+  { id: "erb", nome: "Paralisi di Erb (tronco superiore)", lesione: { sorgente: "tronchi-brachiali", sito: "tronco-superiore" }, vista: "anterolaterale",
+    posa: { spalla: { r: [0, 45, 6] }, avambraccio: { r: [0, 150, 0] }, polso: { r: [-35, 0, 0] }, ...Object.fromEntries([2, 3, 4, 5].map((d) => [`dito${d}_mcf`, { r: [-20, 0, 0] }])) },
+    descrizione: "Braccio addotto e intraruotato, gomito esteso, avambraccio pronato, polso flesso ('mancia del cameriere'): paralisi di deltoide, sovraspinato, infraspinato, flessori del gomito e supinatore.",
+    nota: "Romboidi e serrato anteriore risparmiati: i loro nervi nascono dalle radici, prima del tronco superiore." },
+  { id: "klumpke", nome: "Mano ad artiglio di Klumpke (tronco inferiore)", lesione: { sorgente: "tronchi-brachiali", sito: "tronco-inferiore" }, vista: "mano",
+    posa: { ...DITA_ARTIGLIO([2, 3, 4, 5]), pollice_cmc: { r: [10, 0, 10] } },
+    descrizione: "Artiglio di tutte le dita, con paralisi dei muscoli intrinseci della mano sia del mediano sia dell'ulnare e debolezza dei flessori lunghi delle dita.",
+    nota: "Può associarsi a sindrome di Horner per coinvolgimento delle fibre simpatiche di T1." },
+];
+
+// Muscoli chiave dell'esame obiettivo, con le radici prevalenti (miotomi) usate per la localizzazione
+export const MUSCOLI_CHIAVE = [
+  { id: "romboidi", movimento: "Retrazione della scapola", radici: ["C5"] },
+  { id: "serrato-anteriore", movimento: "Protrazione della scapola", radici: ["C5", "C6", "C7"] },
+  { id: "deltoide", movimento: "Abduzione della spalla", radici: ["C5"] },
+  { id: "infraspinato", movimento: "Extrarotazione della spalla", radici: ["C5", "C6"] },
+  { id: "bicipite", movimento: "Flessione del gomito (supinato)", radici: ["C5", "C6"] },
+  { id: "brachioradiale", movimento: "Flessione del gomito (semipronato)", radici: ["C6"] },
+  { id: "tricipite", movimento: "Estensione del gomito", radici: ["C7"] },
+  { id: "ecrl", movimento: "Estensione del polso", radici: ["C6"] },
+  { id: "edc", movimento: "Estensione delle dita", radici: ["C7"] },
+  { id: "eip", movimento: "Estensione dell'indice", radici: ["C8"] },
+  { id: "fdp-mediano", movimento: "Flessione IFD dell'indice", radici: ["C8"] },
+  { id: "fdp-ulnare", movimento: "Flessione IFD del mignolo", radici: ["C8"] },
+  { id: "apb", movimento: "Abduzione palmare del pollice", radici: ["T1"] },
+  { id: "interossei-dorsali", movimento: "Abduzione dell'indice (I interosseo dorsale)", radici: ["T1"] },
+];
+
+// Esempi per la scheda d'esame: gradi MRC dei muscoli non normali
+export const ESEMPI_ESAME = [
+  { nome: "Tunnel carpale", mrc: { apb: 3 } },
+  { nome: "Ulnare al gomito", mrc: { "fdp-ulnare": 4, "interossei-dorsali": 2 } },
+  { nome: "Polso cadente", mrc: { brachioradiale: 2, ecrl: 1, edc: 1, eip: 1 } },
+  { nome: "Radicolopatia C7", mrc: { tricipite: 4, edc: 4 } },
+  { nome: "Paralisi di Erb", mrc: { deltoide: 1, infraspinato: 2, bicipite: 2, brachioradiale: 2, ecrl: 4 } },
+];

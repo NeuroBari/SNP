@@ -5,7 +5,8 @@ anatomia, movimenti in 3D, patologia ed ENG/EMG.
 
 ## Sezioni
 - **Anatomia** (`anatomia.html`): plessi brachiale e lombosacrale interattivi, schede dei nervi (origine, decorso, rami, muscoli con radici, territorio sensitivo, siti di lesione).
-- **Movimenti 3D** (`movimenti.html`): modelli dell'arto superiore e inferiore che eseguono i movimenti, evidenzia i muscoli per nervo e simula le lesioni.
+- **Movimenti 3D** (`movimenti.html`): modelli realistici (Z-Anatomy) e schematici degli arti; movimenti con muscoli e nervi responsabili; simulazione di lesioni di nervo, tronco, corda, plesso e radice; atteggiamenti tipici (mano ad artiglio, polso cadente, paralisi di Erb, piede cadente…).
+- **Esame obiettivo** (`esame.html`): muscoli chiave per radice e nervo, scala MRC e localizzazione guidata della lesione.
 - **Riflessi** (`riflessi.html`): osteotendinei, superficiali e patologici, scala NINDS, interpretazione; collegati alle schede dei nervi, al 3D e alla simulazione delle lesioni.
 - **Patologia**, **ENG/EMG**: in preparazione.
 - **Fonti** (`fonti.html`): bibliografia e stato di revisione.
@@ -15,6 +16,8 @@ anatomia, movimenti in 3D, patologia ed ENG/EMG.
 assets/js/data/arto-superiore.js   nervi, muscoli, movimenti, plesso brachiale
 assets/js/data/arto-inferiore.js   nervi, muscoli, movimenti, plesso lombosacrale
 assets/js/data/regioni.js          indici comuni e logica delle lesioni
+assets/js/data/lesioni-prossimali.js  lesioni di radice, tronco, corda e plesso (calcolate dai dati dei muscoli)
+assets/js/data/localizza.js        localizzazione didattica dall'esame della forza (MRC)
 assets/js/data/fonti.js            bibliografia
 assets/js/viewer3d.js              motore 3D (three.js, incluso in assets/vendor)
 assets/models/arto-*.glb           modelli realistici (Z-Anatomy, CC BY-SA 4.0)

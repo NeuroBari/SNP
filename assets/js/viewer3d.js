@@ -33,6 +33,9 @@ const VISTE_SUPERIORE = {
   posteriore: [[1.0, -2.0, -19], [1.0, -2.8, 0]],
   scapola: [[-7, 1, -14], [1.0, -1.0, 0]],
   spalla: [[-12, 3, 14], [0.5, -0.8, 0]],
+  avanti: [[-10, 0.8, 7.2], [-0.3, -0.8, 5.0]], // braccio teso in avanti, vista laterale
+  manoAlta: [[-0.4, -1.7, 8.7], [-0.7, -1.9, 1.9]], // mano sollevata davanti al tronco
+  anterolaterale: [[-5.8, -1.9, 12.7], [0.6, -3.1, 0]],
   avambraccio: [[-7, 1.5, 9], [0, -3, 1.6]],
   mano: [[-3, -5.2, 6.5], [0, -6.4, 0.3]],
 };
@@ -42,6 +45,7 @@ const VISTE_INFERIORE = {
   laterale: [[-25, -1.5, 2], [0, -3.3, 0]],
   posteriore: [[1.0, -2.0, -25], [1.0, -3.3, 0]],
   piede: [[-4.5, -6.2, 6.5], [0, -8.5, 0.8]],
+  oscillante: [[-11.7, -2.6, 5.6], [0, -3.6, 1.3]], // fase oscillante del passo, vista laterale
 };
 // Il modello realistico è in metri; le viste si ricavano da quelle schematiche
 // (1 unità ≈ 10 cm) centrate sulla spalla o sull'anca. Queste sono le posizioni

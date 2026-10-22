@@ -192,3 +192,19 @@ a.chip { text-decoration: none; color: inherit; }
 a.voce-mov { text-decoration: none; }
 .riflesso { scroll-margin-top: 72px; }
 #filtri a.btn { flex: 0 1 auto; padding: 6px 14px; }
+
+/* Esame obiettivo */
+.layout-esame > * { min-width: 0; }
+.layout-esame { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.riga-comandi { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 10px; }
+.tabella-esame td { vertical-align: middle; }
+.tabella-esame tr.debole td:first-child { box-shadow: inset 3px 0 0 var(--perso); }
+.mrc { display: inline-flex; gap: 3px; }
+.mrc button { width: 28px; height: 28px; border: 1px solid var(--bordo); border-radius: 6px; background: var(--bg-2); color: var(--testo); font: inherit; font-size: 0.85rem; cursor: pointer; }
+.mrc button:hover { border-color: var(--accento); }
+.mrc button.sel { background: var(--accento); border-color: var(--accento); color: #fff; }
+.mrc button.sel.deb { background: var(--perso); border-color: var(--perso); }
+.esito { border-top: 1px solid var(--bordo); padding: 10px 0; }
+.esito-titolo { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.esito ul { margin: 6px 0; padding-left: 18px; }
+@media (max-width: 1000px) { .layout-esame { grid-template-columns: 1fr; } }

@@ -3,6 +3,7 @@ const PAGINE = [
   ["index.html", "Home"],
   ["anatomia.html", "Anatomia"],
   ["movimenti.html", "Movimenti 3D"],
+  ["esame.html", "Esame obiettivo"],
   ["riflessi.html", "Riflessi"],
   ["patologia.html", "Patologia"],
   ["eng-emg.html", "ENG/EMG"],
