@@ -15,6 +15,9 @@
       <strong>Stato di revisione:</strong> i contenuti della sezione Anatomia sono una prima stesura, da verificare
       da parte dei curatori sulle fonti indicate. I valori radicolari seguono principalmente <em>Aids to the Examination
       of the Peripheral Nervous System</em>; dove le fonti divergono è indicato nelle note.
+      La sezione <strong>Patologia</strong> segue il fascicolo di <em>Continuum</em> "Peripheral Nerve and Motor Neuron Disorders"
+      (ottobre 2026), rielaborato e integrato con le linee guida citate; lo stato regolatorio dei farmaci (EMA, AIFA) va verificato
+      sulle fonti ufficiali dove indicato.
     </div>
     <h2>Testi di riferimento</h2>
     <div id="elenco-fonti"></div>
@@ -46,7 +49,7 @@
   <script type="module">
     import { FONTI } from "./assets/js/data/fonti.js";
     document.getElementById("elenco-fonti").innerHTML = Object.values(FONTI)
-      .map((f) => `<div class="scheda" style="margin:10px 0"><strong>${f.completa}</strong><p>${f.nota}</p></div>`)
+      .map((f) => `<div class="scheda" style="margin:10px 0"><strong>${f.completa}</strong>${f.url ? ` <a href="${f.url}" target="_blank" rel="noopener">link</a>` : ""}<p>${f.nota}</p></div>`)
       .join("");
   </script>
 </body>

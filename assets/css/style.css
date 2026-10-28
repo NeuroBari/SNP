@@ -99,6 +99,7 @@ a.scheda:hover { border-color: var(--accento); }
 
 /* Layout anatomia */
 .layout-anatomia { display: grid; grid-template-columns: 290px 1fr; gap: 24px; align-items: start; }
+.layout-anatomia > * { min-width: 0; }
 .elenco-nervi { position: sticky; top: 76px; }
 .elenco-nervi h4 { margin: 14px 0 6px; font-size: 0.78rem; text-transform: uppercase; color: var(--testo-2); letter-spacing: 0.05em; }
 .elenco-nervi button {
@@ -252,3 +253,18 @@ a.voce-mov { text-decoration: none; }
   .layout-sens { grid-template-columns: 1fr; }
   .elenco-sens { position: static; max-height: none; order: 2; }
 }
+
+/* Patologia */
+a.scheda-pat { text-decoration: none; color: inherit; }
+a.scheda-pat:hover { border-color: var(--accento); }
+.scheda-patologia ul { padding-left: 20px; }
+.scheda-patologia li { margin: 4px 0; }
+.sintesi-pat { font-size: 1.02rem; color: var(--testo) !important; border-left: 4px solid var(--accento); padding-left: 12px; }
+.box-allarme { border-left: 4px solid var(--perso); background: color-mix(in srgb, var(--perso) 8%, var(--bg-2)); border-radius: 6px; padding: 8px 12px; margin: 14px 0; }
+.box-allarme ul { margin: 6px 0 0; columns: 2 260px; }
+.tabella-farmaci td { vertical-align: top; font-size: 0.9rem; }
+.tabella-farmaci td.da-verificare { color: var(--ridotto); }
+@media (max-width: 800px) { .layout-anatomia > #indice { order: 2; position: static; } }
+.scheda-patologia h3 { margin-top: 1.3em; }
+.scheda-patologia p { color: var(--testo); }
+.scheda-patologia p.piccolo, .scheda-patologia p.fonti-voce { color: var(--testo-2); }

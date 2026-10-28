@@ -4,24 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Patologia · SNP</title>
+  <meta name="description" content="Patologia del sistema nervoso periferico e del motoneurone: clinica, diagnosi, terapia, linee guida e stato regolatorio EMA/AIFA.">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body data-pagina="patologia.html">
   <div id="testata"></div>
-  <main class="stretto">
-    <span class="etichetta prossimamente">In preparazione</span>
-    <h1>Patologia del sistema nervoso periferico</h1>
-    <p class="sottotitolo">Struttura prevista della sezione. Ogni scheda collegherà la clinica all'anatomia e al modello 3D.</p>
-    <div class="griglia">
-      <div class="scheda"><h3>Neuropatie focali</h3><p>Tunnel carpale, ulnare al gomito e al canale di Guyon, radiale al solco spirale e PIN, peroneo alla testa della fibula, meralgia parestetica…</p></div>
-      <div class="scheda"><h3>Plessopatie</h3><p>Plesso brachiale (traumatico, neoplastico, post-attinico, amiotrofia nevralgica), plesso lombosacrale.</p></div>
-      <div class="scheda"><h3>Radicolopatie</h3><p>Correlazioni miotomeriche e dermatomeriche, diagnosi differenziale con le lesioni tronculari.</p></div>
-      <div class="scheda"><h3>Polineuropatie</h3><p>Assonali e demielinizzanti, acquisite ed ereditarie; GBS e CIDP secondo le linee guida EAN/PNS.</p></div>
-      <div class="scheda"><h3>Giunzione neuromuscolare</h3><p>Miastenia gravis, sindrome di Lambert-Eaton, botulismo.</p></div>
-      <div class="scheda"><h3>Malattie del motoneurone e miopatie</h3><p>Criteri diagnostici e correlati elettrofisiologici.</p></div>
+  <main>
+    <h1>Patologia</h1>
+    <p class="sottotitolo">Neuropatie periferiche e malattie del motoneurone: clinica, diagnosi, terapia, linee guida e farmaci disponibili in Europa e in Italia.</p>
+    <div class="layout-anatomia">
+      <aside class="elenco-nervi scheda" id="indice" aria-label="Indice delle patologie"></aside>
+      <div id="contenuto"></div>
     </div>
   </main>
   <div id="pie"></div>
   <script src="assets/js/layout.js"></script>
+  <script type="module" src="assets/js/patologia.js"></script>
 </body>
 </html>
