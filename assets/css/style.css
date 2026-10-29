@@ -268,3 +268,34 @@ a.scheda-pat:hover { border-color: var(--accento); }
 .scheda-patologia h3 { margin-top: 1.3em; }
 .scheda-patologia p { color: var(--testo); }
 .scheda-patologia p.piccolo, .scheda-patologia p.fonti-voce { color: var(--testo-2); }
+
+/* Patologia: panoramica a livelli dell'unità motoria */
+#layout-pat.panoramica { grid-template-columns: 1fr; }
+#layout-pat.panoramica > #indice { display: none; }
+.approccio-pat { margin-top: 14px; display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+.approccio-pat > div:first-child { flex: 1 1 380px; }
+.approccio-pat h3 { margin: 0 0 4px; }
+.catena-pat { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 0.85rem; color: var(--testo-2); }
+.catena-pat a { padding: 6px 12px; border-radius: 8px; border: 1px solid; border-left-width: 4px; background: var(--bg-2); color: var(--testo); font-weight: 600; text-decoration: none; }
+.livelli-pat { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 16px; align-items: start; }
+.livello-pat { background: var(--bg-2); border: 1px solid var(--bordo); border-radius: var(--raggio); overflow: hidden; scroll-margin-top: 72px; }
+.livello-pat header { padding: 14px 16px; color: #fff; }
+.livello-pat header h2 { margin: 0; font-size: 1.25rem; }
+.livello-pat header p { margin: 4px 0 0; font-size: 0.86rem; opacity: 0.93; }
+.sotto-pat { padding: 10px 14px; border-top: 1px solid var(--bordo); scroll-margin-top: 72px; }
+.sotto-pat:first-of-type { border-top: 0; }
+.sotto-pat h4 { margin: 0 0 4px; font-size: 0.98rem; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.sotto-pat h4 a { color: var(--testo); }
+.sotto-pat p, .sotto-pat ul { margin: 2px 0 0; font-size: 0.87rem; color: var(--testo-2); }
+.sotto-pat ul { padding-left: 18px; }
+.sotto-pat li { margin: 2px 0; }
+.collegamenti-pat { font-size: 0.82rem !important; margin-top: 6px !important; }
+.pr-pat { font-size: 0.68rem; font-weight: 600; padding: 1px 7px; border-radius: 99px; background: var(--bordo); color: var(--testo-2); white-space: nowrap; }
+.pr-pat.ok { background: color-mix(in srgb, var(--conservato) 18%, var(--bg-2)); color: var(--conservato); }
+#indice .titolo-sotto { margin: 6px 0 2px 8px; font-size: 0.86rem; font-weight: 600; }
+#indice .titolo-gruppo { margin: 4px 0 0 16px; font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--testo-2); }
+#indice button.ramo-pat { padding-left: 22px; font-size: 0.88rem; }
+#indice .voce-prossima { margin: 2px 0 2px 8px; font-size: 0.86rem; color: var(--testo-2); }
+#indice .voce-prossima span { font-size: 0.75rem; }
+@media (max-width: 1200px) { .livelli-pat { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) { .livelli-pat { grid-template-columns: 1fr; } }

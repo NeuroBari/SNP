@@ -11,27 +11,73 @@
 
 export const AGGIORNAMENTO_REGOLATORIO = "ottobre 2026";
 
-// Sezioni della pagina; `stato: "prossimamente"` per i capitoli non ancora scritti
-export const SEZIONI = [
-  { id: "approccio", nome: "Approccio alle neuropatie", descrizione: "Dal quadro clinico al sospetto eziologico: cronologia, distribuzione, fibre coinvolte, esami di primo e secondo livello." },
-  { id: "metaboliche", nome: "Neuropatie metaboliche, carenziali e tossiche", descrizione: "Le cause più frequenti di polineuropatia: diabete, carenze vitaminiche, alcol, farmaci e tossici." },
-  { id: "disimmuni", nome: "Neuropatie disimmuni", descrizione: "Forme acute (Guillain-Barré), croniche (CIDP, nodopatie), paraproteinemiche e infiammatorie assonali (vasculiti, radiculoplessopatie)." },
-  { id: "ereditarie", nome: "Neuropatie ereditarie e da accumulo", descrizione: "Charcot-Marie-Tooth e forme correlate; amiloidosi AL e da transtiretina." },
-  { id: "piccole-fibre", nome: "Neuropatia delle piccole fibre", descrizione: "Dolore neuropatico e disautonomia con conduzioni normali: diagnosi con biopsia cutanea, ricerca della causa, terapia del dolore." },
-  { id: "motoneurone", nome: "Malattie del motoneurone", descrizione: "Sclerosi laterale amiotrofica e atrofia muscolare spinale." },
-  { id: "focali", nome: "Mononeuropatie, plessopatie e radicolopatie", stato: "prossimamente",
-    descrizione: "Intrappolamenti e lesioni focali. Nel frattempo: sedi di lesione in Anatomia, simulatore di lesioni in Movimenti 3D, mappe sensitive." },
-  { id: "giunzione", nome: "Malattie della giunzione neuromuscolare", stato: "prossimamente", descrizione: "Miastenia gravis, sindrome di Lambert-Eaton, botulismo." },
-  { id: "muscolo", nome: "Miopatie", stato: "prossimamente", descrizione: "Miopatie infiammatorie, distrofie, miopatie metaboliche e tossiche." },
+// Struttura della pagina lungo l'unità motoria: motoneurone, radice-plesso-nervo, placca, muscolo.
+// Ogni livello ha sottosezioni; una sottosezione elenca le schede (`schede`), eventualmente
+// raggruppate (`gruppi`), oppure è ancora da scrivere (`stato: "prossimamente"`).
+export const INTRO = "approccio-neuropatia";
+
+export const LIVELLI = [
+  {
+    id: "motoneurone", nome: "Motoneurone", colore: "#2d7a47",
+    descrizione: "Deficit puramente motorio, fascicolazioni; segni di primo e/o secondo motoneurone, sensibilità normale.",
+    sottosezioni: [
+      { id: "sez-sla", nome: "Sclerosi laterale amiotrofica", schede: ["sla"], descrizione: "Primo e secondo motoneurone; varianti: sclerosi laterale primaria, atrofia muscolare progressiva, forme 'flail', bulbare." },
+      { id: "sez-sma", nome: "Atrofia muscolare spinale", schede: ["sma"], descrizione: "SMA 5q, tipi 0–4; nusinersen, risdiplam, terapia genica." },
+      { id: "altre-motoneurone", nome: "Altre malattie del motoneurone", stato: "prossimamente", descrizione: "Atrofia bulbospinale (malattia di Kennedy), sindrome post-polio, amiotrofia monomelica (Hirayama)." },
+      { id: "dd-motoneurone", nome: "Diagnosi differenziale", stato: "prossimamente", descrizione: "Neuropatia motoria multifocale, mielopatia cervicale, miosite da corpi inclusi." },
+    ],
+  },
+  {
+    id: "nervo", nome: "Radice, plesso e nervo", colore: "#1f6f8b",
+    descrizione: "Deficit sensitivo, riflessi ridotti; distribuzione per radice, plesso, nervo o lunghezza-dipendente.",
+    sottosezioni: [
+      { id: "radicolopatie", nome: "Radicolopatie", stato: "prossimamente", descrizione: "Cervicali e lombosacrali; diagnosi differenziale con le lesioni di nervo.",
+        collegamenti: [["movimenti.html#nervo=radici-cervicali&lesione=radice-C6", "Simulatore: radici"], ["sensibilita.html", "Dermatomi"]] },
+      { id: "plessopatie", nome: "Plessopatie", stato: "prossimamente", descrizione: "Plesso brachiale e lombosacrale: traumatiche, neoplastiche, post-attiniche. Amiotrofia nevralgica e radiculoplessopatia diabetica sono già nella scheda sulle neuropatie infiammatorie assonali.",
+        collegamenti: [["#infiammatorie-assonali", "Amiotrofia nevralgica"], ["movimenti.html#nervo=tronchi-brachiali&lesione=tronco-superiore", "Simulatore: plesso"]] },
+      { id: "mononeuropatie", nome: "Mononeuropatie e intrappolamenti", stato: "prossimamente", descrizione: "Tunnel carpale, ulnare al gomito, radiale, peroneo, meralgia parestesica…",
+        collegamenti: [["anatomia.html", "Siti di lesione in Anatomia"], ["sensibilita.html", "Territori cutanei"]] },
+      {
+        id: "polineuropatie", nome: "Polineuropatie", descrizione: "Neuropatie diffuse: metaboliche, disimmuni, ereditarie, delle piccole fibre.",
+        gruppi: [
+          { id: "metaboliche", nome: "Metaboliche, carenziali e tossiche", schede: ["diabetica", "carenziali-tossiche"] },
+          { id: "disimmuni", nome: "Disimmuni", schede: ["gbs", "cidp", "paraproteinemiche", "infiammatorie-assonali"] },
+          { id: "ereditarie-accumulo", nome: "Ereditarie e da accumulo", schede: ["ereditarie", "amiloide"] },
+          { id: "gruppo-piccole-fibre", nome: "Piccole fibre", schede: ["piccole-fibre"] },
+        ],
+      },
+    ],
+  },
+  {
+    id: "placca", nome: "Placca neuromuscolare", colore: "#8e44ad",
+    descrizione: "Debolezza fluttuante e faticabile; sensibilità e riflessi normali.",
+    sottosezioni: [
+      { id: "miastenia", nome: "Miastenia gravis", stato: "prossimamente", descrizione: "Anti-AChR, anti-MuSK, sieronegativa; oculare e generalizzata. Terapie: piridostigmina, immunosoppressori, timectomia, anti-FcRn, inibitori del complemento." },
+      { id: "lems", nome: "Sindrome miastenica di Lambert-Eaton", stato: "prossimamente", descrizione: "Anticorpi anti-canali del calcio voltaggio-dipendenti, spesso paraneoplastica; amifampridina." },
+      { id: "botulismo", nome: "Botulismo e tossici", stato: "prossimamente", descrizione: "Alimentare, da ferita, infantile, iatrogeno; antitossina." },
+      { id: "congenite", nome: "Sindromi miasteniche congenite", stato: "prossimamente", descrizione: "Forme genetiche, per lo più a esordio infantile." },
+    ],
+  },
+  {
+    id: "muscolo", nome: "Muscolo", colore: "#c0392b",
+    descrizione: "Debolezza prossimale simmetrica, CK spesso elevata, sensibilità normale.",
+    sottosezioni: [
+      { id: "miopatie-infiammatorie", nome: "Miopatie infiammatorie", stato: "prossimamente", descrizione: "Dermatomiosite, miopatia necrotizzante immunomediata, sindrome antisintetasi, miosite da corpi inclusi." },
+      { id: "distrofie", nome: "Distrofie muscolari", stato: "prossimamente", descrizione: "Duchenne e Becker, distrofie miotoniche, facio-scapolo-omerale, dei cingoli." },
+      { id: "metaboliche-muscolo", nome: "Miopatie metaboliche e mitocondriali", stato: "prossimamente", descrizione: "Malattia di Pompe, McArdle, deficit di CPT2, miopatie mitocondriali." },
+      { id: "tossiche-endocrine", nome: "Miopatie tossiche ed endocrine", stato: "prossimamente", descrizione: "Statine, corticosteroidi, inibitori dei checkpoint, tireopatie." },
+      { id: "canalopatie", nome: "Canalopatie muscolari", stato: "prossimamente", descrizione: "Paralisi periodiche, miotonie non distrofiche." },
+    ],
+  },
 ];
 
 const EMA = "https://www.ema.europa.eu/en/medicines";
 const AIFA = "https://medicinali.aifa.gov.it/";
 
 export const PATOLOGIE = [
-  // ------------------------------------------------------------------ Approccio
+  // ------------------------------------------------------------------ Introduzione
   {
-    id: "approccio-neuropatia", sezione: "approccio", nome: "Approccio diagnostico alle neuropatie",
+    id: "approccio-neuropatia", nome: "Approccio diagnostico alle neuropatie",
     breve: "Metodo per inquadrare una polineuropatia e scegliere gli esami.",
     continuum: "contSadjadi",
     sintesi: "La diagnosi resta clinica: anamnesi ed esame obiettivo orientano gli esami strumentali, che completano ma non sostituiscono la valutazione. Il diabete è il fattore di rischio più frequente (circa un terzo dei casi) e quasi metà delle polineuropatie resta idiopatica, ma una parte delle forme considerate idiopatiche si rivela ereditaria o acquisita con indagini mirate.",
@@ -66,7 +112,7 @@ export const PATOLOGIE = [
 
   // ------------------------------------------------------------------ Metaboliche
   {
-    id: "diabetica", sezione: "metaboliche", nome: "Neuropatie diabetiche",
+    id: "diabetica", nome: "Neuropatie diabetiche",
     breve: "Polineuropatia distale simmetrica, neuropatia autonomica e altre forme associate al diabete.",
     continuum: "contFridman",
     sintesi: "Il danno nervoso nel diabete è eterogeneo: polineuropatia distale simmetrica (la più frequente), neuropatia autonomica cardiovascolare, gastrointestinale e urogenitale, perdita della sensibilità protettiva con rischio di ulcere del piede. È una delle prime cinque cause neurologiche di disabilità nel mondo ed è ancora poco ricercata.",
@@ -95,11 +141,11 @@ export const PATOLOGIE = [
       { nome: "Pregabalin, gabapentin", uso: "Dolore neuropatico periferico", ema: "Autorizzati (procedure nazionali o centralizzate)", aifa: "Come sopra: Nota 4 abolita nel 2025, da verificare" },
       { nome: "Capsaicina 8% cerotto", uso: "Dolore neuropatico periferico dell'adulto, uso ambulatoriale", ema: "Autorizzata (procedura centralizzata)", aifa: "Da verificare" },
     ],
-    collegamenti: [["sensibilita.html#regione=inferiore", "Mappe sensitive dell'arto inferiore"], ["patologia.html#piccole-fibre", "Neuropatia delle piccole fibre"]],
+    collegamenti: [["sensibilita.html#regione=inferiore", "Mappe sensitive dell'arto inferiore"], ["#piccole-fibre", "Neuropatia delle piccole fibre"]],
     fonti: ["contFridman", "neupsig2025"],
   },
   {
-    id: "carenziali-tossiche", sezione: "metaboliche", nome: "Neuropatie carenziali e tossiche",
+    id: "carenziali-tossiche", nome: "Neuropatie carenziali e tossiche",
     breve: "Vitamine B12, B1, B6, E, rame; protossido d'azoto, metalli, chemioterapici, inibitori dei checkpoint.",
     continuum: "contGable",
     sintesi: "Carenze nutrizionali, tossici e farmaci sono cause frequenti e spesso correggibili: riconosciute presto, la neuropatia si stabilizza o migliora. Sono in aumento le forme dopo chirurgia bariatrica (supplementazione insufficiente), da uso ricreativo di protossido d'azoto e da inibitori dei checkpoint immunitari.",
@@ -136,7 +182,7 @@ export const PATOLOGIE = [
 
   // ------------------------------------------------------------------ Disimmuni
   {
-    id: "gbs", sezione: "disimmuni", nome: "Sindrome di Guillain-Barré",
+    id: "gbs", nome: "Sindrome di Guillain-Barré",
     breve: "Poliradicoloneuropatia acuta immunomediata: emergenza neuromuscolare.",
     continuum: "contPasnoor",
     sintesi: "Poliradicoloneuropatia acuta immunomediata, di solito monofasica e postinfettiva, con debolezza progressiva e iporeflessia che raggiungono il nadir entro 4 settimane. È un'emergenza: fino a un terzo dei pazienti richiede ventilazione.",
@@ -188,7 +234,7 @@ export const PATOLOGIE = [
     fonti: ["contPasnoor", "eanpnsGbs2023"],
   },
   {
-    id: "cidp", sezione: "disimmuni", nome: "Poliradicoloneuropatia demielinizzante infiammatoria cronica (CIDP)",
+    id: "cidp", nome: "Poliradicoloneuropatia demielinizzante infiammatoria cronica (CIDP)",
     breve: "Neuropatia demielinizzante immunomediata cronica, trattabile e spesso sbagliata nella diagnosi.",
     continuum: "contSethAllen",
     sintesi: "Sindrome immunomediata cronica (progressione oltre 8 settimane) con forma tipica e varianti. Rara ma trattabile: l'80–90% dei pazienti migliora con almeno una delle terapie di provata efficacia. Le diagnosi errate sono frequenti e espongono a terapie inutili.",
@@ -229,7 +275,7 @@ export const PATOLOGIE = [
     fonti: ["contSethAllen", "cidp2021"],
   },
   {
-    id: "paraproteinemiche", sezione: "disimmuni", nome: "Neuropatie paraproteinemiche",
+    id: "paraproteinemiche", nome: "Neuropatie paraproteinemiche",
     breve: "Anti-MAG, CANOMAD, POEMS, amiloidosi AL, mieloma e crioglobulinemia.",
     continuum: "contStinoBecker",
     sintesi: "Le gammopatie monoclonali sono frequenti e aumentano con l'età: spesso una MGUS con polineuropatia distale simmetrica è una coincidenza. Alcuni segni d'allarme impongono invece un percorso guidato dal fenotipo, perché tipo di paraproteina, neuropatia e malattia ematologica sottostante sono collegati.",
@@ -258,7 +304,7 @@ export const PATOLOGIE = [
     fonti: ["contStinoBecker"],
   },
   {
-    id: "infiammatorie-assonali", sezione: "disimmuni", nome: "Neuropatie infiammatorie assonali e vasculitiche",
+    id: "infiammatorie-assonali", nome: "Neuropatie infiammatorie assonali e vasculitiche",
     breve: "Mononeurite multipla, vasculiti sistemiche e non sistemiche, radiculoplessopatie, sarcoidosi.",
     continuum: "contFanChaudhry",
     sintesi: "Gruppo di neuropatie immunomediate con danno assonale. Quattro quadri di presentazione: mononeurite multipla, polineuropatia sensitivo-motoria asimmetrica, atassia sensitiva (ganglionopatia), radiculoplessopatia. La diagnosi richiede sospetto clinico, ENG mirato dall'esame obiettivo e attenzione ai segni sistemici.",
@@ -294,7 +340,7 @@ export const PATOLOGIE = [
 
   // ------------------------------------------------------------------ Ereditarie e da accumulo
   {
-    id: "ereditarie", sezione: "ereditarie", nome: "Neuropatie ereditarie (Charcot-Marie-Tooth e forme correlate)",
+    id: "ereditarie", nome: "Neuropatie ereditarie (Charcot-Marie-Tooth e forme correlate)",
     breve: "La malattia neuromuscolare ereditaria più frequente: oltre 100 geni.",
     continuum: "contSaportaZuchner",
     sintesi: "Le neuropatie ereditarie sono tra le malattie neuromuscolari genetiche più comuni. La Charcot-Marie-Tooth (CMT), sensitivo-motoria, è il prototipo ed è legata a varianti in oltre 100 geni; esistono forme prevalentemente motorie (neuropatie motorie ereditarie distali), sensitivo-autonomiche (HSAN) e forme multisistemiche (amiloidosi familiare, neuropatie metaboliche).",
@@ -324,7 +370,7 @@ export const PATOLOGIE = [
     fonti: ["contSaportaZuchner"],
   },
   {
-    id: "amiloide", sezione: "ereditarie", nome: "Neuropatie amiloidotiche",
+    id: "amiloide", nome: "Neuropatie amiloidotiche",
     breve: "Amiloidosi AL e da transtiretina (ATTRv, ATTRwt): progressive ma trattabili.",
     continuum: "contPinto",
     sintesi: "Quasi tutte le neuropatie amiloidotiche sono dovute ad amiloidosi a catene leggere (AL) o ad amiloidosi ereditaria da transtiretina (ATTRv): malattie trattabili da non mancare. Progressione rapida e disautonomia sono i due indizi principali.",
@@ -367,7 +413,7 @@ export const PATOLOGIE = [
 
   // ------------------------------------------------------------------ Piccole fibre
   {
-    id: "piccole-fibre-scheda", sezione: "piccole-fibre", nome: "Neuropatia delle piccole fibre",
+    id: "piccole-fibre", nome: "Neuropatia delle piccole fibre",
     breve: "Dolore urente e disautonomia con conduzioni nervose normali.",
     continuum: "contEckensteinWaheed",
     sintesi: "Interessamento selettivo delle fibre Aδ sottilmente mieliniche e C amieliniche (dolore, temperatura, funzioni autonomiche). L'incidenza è in aumento soprattutto per il miglior riconoscimento; dolore cronico e disautonomia pesano molto sulla qualità di vita.",
@@ -398,7 +444,7 @@ export const PATOLOGIE = [
 
   // ------------------------------------------------------------------ Motoneurone
   {
-    id: "sla", sezione: "motoneurone", nome: "Sclerosi laterale amiotrofica",
+    id: "sla", nome: "Sclerosi laterale amiotrofica",
     breve: "Degenerazione del primo e del secondo motoneurone; frequente coinvolgimento frontotemporale.",
     continuum: "contBromberg",
     sintesi: "Malattia neurodegenerativa del primo (UMN) e secondo motoneurone (LMN), a esordio focale e diffusione progressiva ad altre regioni. La diagnosi è soprattutto clinica e i veri imitatori sono rari. Circa metà dei pazienti ha anche sintomi non motori.",
@@ -436,7 +482,7 @@ export const PATOLOGIE = [
     fonti: ["contBromberg", "goldCoast2020", "eanSla2024"],
   },
   {
-    id: "sma", sezione: "motoneurone", nome: "Atrofia muscolare spinale",
+    id: "sma", nome: "Atrofia muscolare spinale",
     breve: "Malattia autosomica recessiva da perdita di SMN1; storia naturale cambiata da terapie e screening neonatale.",
     continuum: "contLeeCiafaloni",
     sintesi: "Malattia autosomica recessiva del secondo motoneurone dovuta alla perdita biallelica del gene SMN1 (5q). Il gene 'di riserva' SMN2 produce solo il 15% circa di proteina funzionante: più copie di SMN2, fenotipo più lieve. Terapie modificanti la malattia e screening neonatale hanno trasformato la storia naturale, ma non esiste una cura.",

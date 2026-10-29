@@ -1,9 +1,9 @@
-import { SEZIONI, PATOLOGIE, AGGIORNAMENTO_REGOLATORIO, LINK_REGOLATORI } from "./data/patologie.js";
+import { LIVELLI, INTRO, PATOLOGIE, AGGIORNAMENTO_REGOLATORIO, LINK_REGOLATORI } from "./data/patologie.js";
 import { FONTI } from "./data/fonti.js";
 
 const $ = (sel) => document.querySelector(sel);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
-const schedeDi = (idSezione) => PATOLOGIE.filter((p) => p.sezione === idSezione);
+const schedaPerId = Object.fromEntries(PATOLOGIE.map((p) => [p.id, p]));
 const lista = (arr) => `<ul>${arr.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`;
 const fonte = (k) => {
   const f = FONTI[k];
@@ -11,38 +11,74 @@ const fonte = (k) => {
   return f.url ? `<a href="${f.url}" target="_blank" rel="noopener">${esc(f.breve)}</a>` : esc(f.breve);
 };
 
-// --- Indice laterale
-function disegnaIndice(attivo) {
-  $("#indice").innerHTML =
-    `<button data-vai="" class="${attivo ? "" : "attivo"}">Panoramica</button>` +
-    SEZIONI.map((s) => {
-      const schede = schedeDi(s.id);
-      return `<h4>${esc(s.nome)}</h4>` +
-        (schede.length
-          ? schede.map((p) => `<button data-vai="${p.id}" class="${p.id === attivo ? "attivo" : ""}">${esc(p.nome)}</button>`).join("")
-          : `<p class="piccolo" style="margin:0 0 0 8px">In preparazione</p>`);
-    }).join("");
+// Schede di una sottosezione (dirette o raggruppate)
+const schedeDi = (sotto) => [...(sotto.schede || []), ...(sotto.gruppi || []).flatMap((g) => g.schede)];
+
+// Percorso di una scheda: livello, sottosezione ed eventuale gruppo
+function percorso(idScheda) {
+  for (const liv of LIVELLI) {
+    for (const sotto of liv.sottosezioni) {
+      if (sotto.schede?.includes(idScheda)) return { liv, sotto };
+      const gruppo = sotto.gruppi?.find((g) => g.schede.includes(idScheda));
+      if (gruppo) return { liv, sotto, gruppo };
+    }
+  }
+  return null;
 }
 
-// --- Panoramica per sezioni
-function disegnaPanoramica(idSezione) {
+// --- Indice laterale (vista scheda)
+function disegnaIndice(attivo) {
+  const voce = (id) => `<button data-vai="${id}" class="ramo-pat${id === attivo ? " attivo" : ""}">${esc(schedaPerId[id].nome)}</button>`;
+  $("#indice").innerHTML =
+    `<button data-vai="">Panoramica</button>` +
+    `<button data-vai="${INTRO}" class="${attivo === INTRO ? "attivo" : ""}">${esc(schedaPerId[INTRO].nome)}</button>` +
+    LIVELLI.map((liv) => `<h4><span class="pallino" style="background:${liv.colore}"></span>${esc(liv.nome)}</h4>` +
+      liv.sottosezioni.map((sotto) => {
+        if (sotto.stato) return `<p class="voce-prossima">${esc(sotto.nome)} <span>· in preparazione</span></p>`;
+        if (sotto.schede?.length === 1 && schedaPerId[sotto.schede[0]].nome === sotto.nome) return voce(sotto.schede[0]).replace("ramo-pat", "");
+        return `<p class="titolo-sotto">${esc(sotto.nome)}</p>` +
+          (sotto.schede || []).map(voce).join("") +
+          (sotto.gruppi || []).map((g) => `<p class="titolo-gruppo">${esc(g.nome)}</p>${g.schede.map(voce).join("")}`).join("");
+      }).join("")
+    ).join("");
+}
+
+// --- Panoramica: introduzione e quattro livelli
+function disegnaPanoramica(ancora) {
+  const link = (id) => `<a href="#${id}">${esc(schedaPerId[id].nome)}</a>`;
+  const conteggio = (n) => `<span class="pr-pat ok">${n === 1 ? "scheda" : `${n} schede`}</span>`;
   $("#contenuto").innerHTML = `
     <div class="avviso" style="margin-top:0">
-      La struttura della sezione segue il fascicolo di <em>Continuum</em> "Peripheral Nerve and Motor Neuron Disorders" (ottobre 2026),
+      La struttura delle neuropatie segue il fascicolo di <em>Continuum</em> "Peripheral Nerve and Motor Neuron Disorders" (ottobre 2026),
       i cui contenuti sono rielaborati e integrati con le linee guida europee (EAN/PNS) e con lo stato regolatorio dei farmaci (EMA, AIFA).
     </div>
-    ${SEZIONI.map((s) => {
-      const schede = schedeDi(s.id);
-      return `<section class="scheda sezione-pat" id="sez-${s.id}" style="margin-top:16px">
-        <h2 style="margin-top:0">${esc(s.nome)} ${s.stato ? `<span class="etichetta prossimamente">In preparazione</span>` : ""}</h2>
-        <p>${esc(s.descrizione)}</p>
-        ${schede.length ? `<div class="griglia" style="margin-top:12px">${schede
-          .map((p) => `<a class="scheda scheda-pat" href="#${p.id}"><h3>${esc(p.nome)}</h3><p>${esc(p.breve)}</p></a>`)
-          .join("")}</div>` : ""}
-        ${s.id === "focali" ? `<p style="margin-top:10px"><a class="btn" href="anatomia.html">Siti di lesione in Anatomia</a> <a class="btn" href="movimenti.html">Simulatore di lesioni</a> <a class="btn" href="sensibilita.html">Mappe sensitive</a></p>` : ""}
-      </section>`;
-    }).join("")}`;
-  if (idSezione) document.getElementById(`sez-${idSezione}`)?.scrollIntoView({ block: "start" });
+    <div class="scheda approccio-pat">
+      <div>
+        <h3>Approccio al paziente neuromuscolare</h3>
+        <p>Dove è la lesione? Distribuzione del deficit, riflessi, sensibilità, faticabilità, CK ed ENG/EMG orientano verso motoneurone, radice-plesso-nervo, placca o muscolo.
+          <a href="#${INTRO}">${esc(schedaPerId[INTRO].nome)} →</a></p>
+      </div>
+      <div class="catena-pat" aria-label="Unità motoria">${LIVELLI.map((l) => `<a href="#${l.id}" style="border-color:${l.colore}">${esc(l.nome)}</a>`).join("<span>→</span>")}</div>
+    </div>
+    <div class="livelli-pat">${LIVELLI.map((liv) => `
+      <section class="livello-pat" id="${liv.id}">
+        <header style="background:${liv.colore}"><h2>${esc(liv.nome)}</h2><p>${esc(liv.descrizione)}</p></header>
+        ${liv.sottosezioni.map((sotto) => {
+          const n = schedeDi(sotto).length;
+          const corpo = sotto.gruppi
+            ? `<ul>${sotto.gruppi.map((g) => `<li><strong>${esc(g.nome)}:</strong> ${g.schede.map(link).join(", ")}</li>`).join("")}</ul>`
+            : `<p>${esc(sotto.descrizione)}</p>${n && !(n === 1 && schedaPerId[sotto.schede[0]].nome === sotto.nome) ? `<ul>${sotto.schede.map((id) => `<li>${link(id)}</li>`).join("")}</ul>` : ""}`;
+          const titolo = n === 1 && !sotto.gruppi ? `<a href="#${sotto.schede[0]}">${esc(sotto.nome)}</a>` : esc(sotto.nome);
+          return `<div class="sotto-pat" id="${sotto.id}">
+            <h4>${titolo} ${sotto.stato ? `<span class="pr-pat">in preparazione</span>` : conteggio(n)}</h4>
+            ${corpo}
+            ${sotto.collegamenti?.length ? `<p class="collegamenti-pat">${sotto.collegamenti.map(([h, t]) => `<a href="${h}">${esc(t)}</a>`).join(" · ")}</p>` : ""}
+          </div>`;
+        }).join("")}
+      </section>`).join("")}
+    </div>`;
+  if (ancora) document.getElementById(ancora)?.scrollIntoView({ block: "start" });
+  else window.scrollTo({ top: 0 });
 }
 
 // --- Tabella dei farmaci
@@ -63,10 +99,13 @@ function tabellaFarmaci(farmaci) {
 
 // --- Scheda della patologia
 function disegnaScheda(p) {
-  const sezione = SEZIONI.find((s) => s.id === p.sezione);
+  const pos = percorso(p.id);
+  const briciole = pos
+    ? `<a href="#${pos.liv.id}">${esc(pos.liv.nome)}</a>${pos.sotto.nome === p.nome ? "" : ` › <a href="#${pos.sotto.id}">${esc(pos.sotto.nome)}</a>`}${pos.gruppo ? ` › ${esc(pos.gruppo.nome)}` : ""}`
+    : `<a href="#">Introduzione</a>`;
   const blocco = (titolo, contenuto) => (contenuto && contenuto.length ? `<h3>${titolo}</h3>${Array.isArray(contenuto) ? lista(contenuto) : `<p>${esc(contenuto)}</p>`}` : "");
-  $("#contenuto").innerHTML = `<article class="scheda scheda-patologia">
-    <p class="piccolo" style="margin:0"><a href="#${sezione.id}">${esc(sezione.nome)}</a></p>
+  $("#contenuto").innerHTML = `<article class="scheda scheda-patologia"${pos ? ` style="border-top:4px solid ${pos.liv.colore}"` : ""}>
+    <p class="piccolo" style="margin:0">${briciole}</p>
     <h2 style="margin-top:4px">${esc(p.nome)}</h2>
     <p class="sintesi-pat">${esc(p.sintesi)}</p>
     ${blocco("Epidemiologia e fattori di rischio", p.epidemiologia)}
@@ -80,30 +119,28 @@ function disegnaScheda(p) {
     ${p.collegamenti?.length ? `<h3>Collegamenti nel sito</h3><p>${p.collegamenti.map(([h, t]) => `<a class="btn" href="${h}">${esc(t)}</a>`).join(" ")}</p>` : ""}
     <p class="fonti-voce">Fonti: ${p.fonti.map(fonte).join("; ")}. Articolo di riferimento: ${esc(FONTI[p.continuum]?.completa || "")}</p>
   </article>`;
+  window.scrollTo({ top: 0 });
 }
 
+// L'indirizzo può indicare una scheda (#cidp), un livello (#nervo) o una sottosezione (#polineuropatie)
 function mostra(id) {
-  const p = PATOLOGIE.find((x) => x.id === id);
-  const sezione = SEZIONI.find((s) => s.id === id);
-  // Una sezione con una sola scheda apre direttamente la scheda
-  const unica = sezione && schedeDi(sezione.id).length === 1 ? schedeDi(sezione.id)[0] : null;
-  const scheda = p || unica;
-  disegnaIndice(scheda?.id || "");
+  const scheda = schedaPerId[id];
+  $("#layout-pat").classList.toggle("panoramica", !scheda);
   if (scheda) {
     document.title = `${scheda.nome} · Patologia · SNP`;
+    disegnaIndice(id);
     disegnaScheda(scheda);
-    window.scrollTo({ top: 0 });
   } else {
     document.title = "Patologia · SNP";
-    disegnaPanoramica(sezione?.id);
+    disegnaPanoramica(id);
   }
 }
 
 document.addEventListener("click", (ev) => {
   const el = ev.target.closest("[data-vai]");
   if (!el) return;
-  location.hash = el.dataset.vai;
-  if (!el.dataset.vai) mostra("");
+  if (location.hash.slice(1) === el.dataset.vai) mostra(el.dataset.vai);
+  else location.hash = el.dataset.vai;
 });
 window.addEventListener("hashchange", () => mostra(location.hash.slice(1)));
 mostra(location.hash.slice(1));
